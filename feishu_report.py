@@ -4,6 +4,8 @@ import requests
 from dotenv import load_dotenv
 from notion_read import read_notion_texts
 from ollama_extract import extract_time_info
+from notion_write import write_summary_to_notion
+from notion_sync import sync_day_from_source_page, write_summary_to_notion
 
 load_dotenv()
 
@@ -105,16 +107,28 @@ def main() -> None:
 
     target_date = sys.argv[1]
 
+    print(f"\n准备从日程页面同步 {target_date} 的原始记录到 Notion 数据库...\n")
+    sync_day_from_source_page(target_date)
+
     texts = read_notion_texts(target_date)
     extraction_result = extract_time_info(texts)
     items = extraction_result.get("items", [])
 
     report = build_report(target_date, items)
-
+    print(f"\n{target_date} 的时间利用报告如下：\n")
     print(report)
-    print("\n准备发送到飞书...\n")
 
-    send_feishu_text(report)
+    print(f"\n准备发送 {target_date} 的时间利用报告到飞书...\n")
+    try:
+        send_feishu_text(report)
+    except Exception as e:
+        print("飞书发送失败：", e)
+
+    print(f"\n准备写入 {target_date} 的 Notion summary...\n")
+    try:
+        write_summary_to_notion(target_date, report)
+    except Exception as e:
+        print("Notion summary 写入失败：", e)
 
 
 if __name__ == "__main__":
