@@ -23,7 +23,7 @@ TIME_EXTRACTION_SCHEMA = {
                     "duration_min": {"type": "integer"},
                     "time_type": {
                         "type": "string",
-                        "enum": ["effective", "ineffective", "neutral"],
+                        "enum": ["effective", "buffer", "ignored"],
                     },
                     "evidence": {"type": "string"},
                 },
@@ -46,13 +46,13 @@ def extract_time_info(texts: list[str]) -> dict:
 
 分类规则：
 1. effective：写代码、项目、阅读、学习、看书、面试准备、简历相关等真正推进目标的活动。
-2. ineffective：游戏、刷手机。
-3. neutral：吃饭、洗澡、通勤、睡觉、购物、家务、必要生活事务、休息、旅游。
+2. buffer：游戏、刷手机。
+3. ignored：吃饭、洗澡、通勤、睡觉、购物、家务、必要生活事务、休息、旅游。
 
 输出要求：
 1. 只抽取有明确时长的活动；没有明确时长就不要抽取。
 2. duration_min 必须换算成分钟，例如 1h=60，2小时=120，半小时=30。
-3. time_type 必须严格从 effective、ineffective、neutral 三者中选择一个。
+3. time_type 必须严格从 effective、buffer、ignored 三者中选择一个。
 4. 不要编造原文没有的活动或时长。
 5. evidence 必须填写原文依据。
 6. 只输出 JSON，不要输出解释文字。
