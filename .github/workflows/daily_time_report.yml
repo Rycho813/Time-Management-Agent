@@ -1,0 +1,55 @@
+name: Daily Time Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+      timezone: "Asia/Singapore"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-time-report
+  cancel-in-progress: false
+
+jobs:
+  run-daily-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      NOTION_NAME_PROP: ${{ vars.NOTION_NAME_PROP }}
+      NOTION_DATE_PROP: ${{ vars.NOTION_DATE_PROP }}
+      NOTION_SNAPSHOT_PROP: ${{ vars.NOTION_SNAPSHOT_PROP }}
+      NOTION_SUMMARY_PROP: ${{ vars.NOTION_SUMMARY_PROP }}
+      MIGRATION_YEAR: ${{ vars.MIGRATION_YEAR }}
+      NOTION_VERSION: ${{ vars.NOTION_VERSION }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+      APP_TIMEZONE: ${{ vars.APP_TIMEZONE }}
+      WEEKLY_SUMMARY_DAY: ${{ vars.WEEKLY_SUMMARY_DAY }}
+
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+      NOTION_SOURCE_PAGE_ID: ${{ secrets.NOTION_SOURCE_PAGE_ID }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run daily migration and summary
+        run: |
+          python migrate_and_summary.py

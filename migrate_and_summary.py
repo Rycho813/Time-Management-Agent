@@ -13,7 +13,7 @@ from notion_migration import (
     NOTION_SUMMARY_PROP,
 )
 from notion_write import update_page_rich_text_properties
-from ollama_extract import extract_time_info
+from llm_time_extract import extract_time_info
 from time_summary import (
     normalize_items,
     build_activity_snapshot,
@@ -58,18 +58,18 @@ def resolve_target_dates(args) -> list[str]:
     if args.date:
         return [args.date]
 
-    return [get_today_str()]
+    return [get_relative_date_str(args.default_date_offset)]
 
-
-# def get_today_str() -> str:
-#     return datetime.now(ZoneInfo(APP_TIMEZONE)).date().isoformat()
-
-def get_today_str() -> str:
+def get_current_local_date() -> date:  # 修改后：新增
     try:  # 修改后
-        return datetime.now(ZoneInfo(APP_TIMEZONE)).date().isoformat()  # 修改后
+        return datetime.now(ZoneInfo(APP_TIMEZONE)).date()  # 修改后
     except ZoneInfoNotFoundError:  # 修改后
         print(f"警告：当前 Python 环境缺少时区数据库，暂时使用本机本地日期；建议执行：python -m pip install tzdata")  # 修改后
-        return datetime.now().date().isoformat()  # 修改后
+        return datetime.now().date()  # 修改后
+
+
+def get_relative_date_str(days_offset: int = -1) -> str:  # 修改后：新增
+    return (get_current_local_date() + timedelta(days=days_offset)).isoformat()  # 修改后
 
 def validate_sleep_hours(sleep_hours: float) -> int:
     sleep_minutes = int(round(sleep_hours * 60))
@@ -176,7 +176,7 @@ def run_daily_workflow(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="每天自动迁移当天日程；也支持按日期范围批量迁移、总结、发送飞书。"
+        description="每天自动迁移当天日程；默认处理的话就是处理昨天的日程，也支持按日期范围批量迁移、总结、发送飞书。"
     )
 
     parser.add_argument(
@@ -186,6 +186,12 @@ def main() -> None:
     )
     parser.add_argument("--start", default=None, help="批量开始日期，例如 2026-07-01")
     parser.add_argument("--end", default=None, help="批量结束日期，例如 2026-07-08")
+    parser.add_argument(
+        "--default-date-offset",
+        type=int,
+        default=-1,
+        help="不传 --date / --start / --end 时的默认日期偏移；-1 表示昨天，0 表示今天，默认 -1",  # 修改后
+    )
     parser.add_argument(
         "--overwrite-body",
         action="store_true",
