@@ -1,4 +1,6 @@
 # 生成Snapshot，summary和飞书报告的文本。
+from datetime import date
+
 def format_minutes(minutes: int) -> str:
     minutes = max(int(minutes), 0)
     hours = minutes // 60
@@ -106,6 +108,13 @@ def build_summary(target_date: str, items: list[dict], sleep_minutes: int) -> st
 
     return "\n".join(lines)
 
+def get_weekday_cn(target_date: str) -> str:  # 修改后：新增
+    weekday_map = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+    return weekday_map[date.fromisoformat(target_date).weekday()]
 
-def build_feishu_report(target_date: str, snapshot: str, summary: str) -> str:
-    return f"【时间管理日报｜{target_date}】\n\n{summary}\n\n{snapshot}"
+# def build_feishu_report(target_date: str, snapshot: str, summary: str) -> str:
+#     return f"【时间管理日报｜{target_date}】\n\n{summary}\n\n{snapshot}"
+
+def build_feishu_report(target_date: str, snapshot: str, summary: str) -> str:  # 修改后
+    weekday = get_weekday_cn(target_date)  # 修改后
+    return f"【时间管理日报｜{target_date} {weekday}】\n\n{summary}\n\n{snapshot}"  # 修改后

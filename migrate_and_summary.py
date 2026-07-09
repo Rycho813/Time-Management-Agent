@@ -3,7 +3,7 @@
 import os
 import argparse
 from datetime import datetime, date, timedelta
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from dotenv import load_dotenv
 
 from notion_migration import (
@@ -19,6 +19,12 @@ from time_summary import (
     build_activity_snapshot,
     build_summary,
     build_feishu_report,
+)
+from time_comparison import (
+    build_current_stats,
+    build_comparison_sections,
+    format_weekday_cn,
+    normalize_weekly_summary_day,
 )
 from feishu_report import send_feishu_text
 
@@ -55,9 +61,15 @@ def resolve_target_dates(args) -> list[str]:
     return [get_today_str()]
 
 
-def get_today_str() -> str:
-    return datetime.now(ZoneInfo(APP_TIMEZONE)).date().isoformat()
+# def get_today_str() -> str:
+#     return datetime.now(ZoneInfo(APP_TIMEZONE)).date().isoformat()
 
+def get_today_str() -> str:
+    try:  # 修改后
+        return datetime.now(ZoneInfo(APP_TIMEZONE)).date().isoformat()  # 修改后
+    except ZoneInfoNotFoundError:  # 修改后
+        print(f"警告：当前 Python 环境缺少时区数据库，暂时使用本机本地日期；建议执行：python -m pip install tzdata")  # 修改后
+        return datetime.now().date().isoformat()  # 修改后
 
 def validate_sleep_hours(sleep_hours: float) -> int:
     sleep_minutes = int(round(sleep_hours * 60))
@@ -73,6 +85,7 @@ def generate_snapshot_and_summary(
     page_id: str,
     source_block_id: str,
     sleep_minutes: int,
+    weekly_summary_weekday: int | None,
 ) -> tuple[str, str]:
     print(f"\n准备读取 {target_date} 的层级日程文本...\n")
     hierarchical_texts = collect_hierarchical_texts(source_block_id)
@@ -87,6 +100,17 @@ def generate_snapshot_and_summary(
     snapshot = build_activity_snapshot(target_date, items)
     summary = build_summary(target_date, items, sleep_minutes)
 
+    current_stats = build_current_stats(target_date, items, sleep_minutes)
+    comparison_sections = build_comparison_sections(
+        target_date=target_date,
+        current_stats=current_stats,
+        summary_prop=NOTION_SUMMARY_PROP,
+        weekly_summary_weekday=weekly_summary_weekday,
+    )
+
+    if comparison_sections:
+        summary = f"{summary}\n\n{comparison_sections}"
+
     print(f"\n准备写入 {target_date} 的 Activity Snapshot 和 summary...\n")
     update_page_rich_text_properties(
         page_id,
@@ -99,7 +123,6 @@ def generate_snapshot_and_summary(
     print(f"已写入 AI 总结：{target_date}")
     return snapshot, summary
 
-
 def run_daily_workflow(
     target_date: str,
     overwrite_body: bool,
@@ -108,12 +131,14 @@ def run_daily_workflow(
     sleep_hours: float,
     send_feishu: bool,
     dry_run: bool,
+    weekly_summary_weekday: int | None,
 ) -> None:
     sleep_minutes = validate_sleep_hours(sleep_hours)
 
     print(f"\n开始执行 {target_date} 的日程迁移与总结流程")
     print(f"当前时区：{APP_TIMEZONE}")
     print(f"睡觉时间：{sleep_hours}h")
+    print(f"周总结触发日：{format_weekday_cn(weekly_summary_weekday)}")  # 新增
 
     page_id, source_block_id = migrate_single_day(
         target_date=target_date,
@@ -136,6 +161,7 @@ def run_daily_workflow(
         page_id=page_id,
         source_block_id=source_block_id,
         sleep_minutes=sleep_minutes,
+        weekly_summary_weekday=weekly_summary_weekday,  # 新增
     )
 
     report = build_feishu_report(target_date, snapshot, summary)
@@ -147,7 +173,6 @@ def run_daily_workflow(
         print(f"\n已关闭飞书发送，仅完成 Notion 迁移与 AI 总结：{target_date}")
 
     print(f"\n执行完成：{target_date}")
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -164,16 +189,19 @@ def main() -> None:
     parser.add_argument(
         "--overwrite-body",
         action="store_true",
+        default=True,
         help="如果目标页面正文已有内容，先清空再重建折叠层级",
     )
     parser.add_argument(
         "--clear-snapshot",
         action="store_true",
+        default=True,
         help="迁移时先清空 Activity Snapshot 属性列",
     )
     parser.add_argument(
         "--clear-summary",
         action="store_true",
+        default=True,
         help="迁移时先清空 summary 属性列",
     )
     parser.add_argument(
@@ -192,9 +220,15 @@ def main() -> None:
         action="store_true",
         help="只预览，不实际写入 Notion，不调用 AI，不发送飞书",
     )
+    parser.add_argument(
+        "--weekly-summary-day",
+        default=os.getenv("WEEKLY_SUMMARY_DAY", "sunday"),
+        help="周总结触发日，支持 monday~sunday、1~7、周一~周日；填 none 表示关闭，默认 sunday",
+    )
 
     args = parser.parse_args()
     target_dates = resolve_target_dates(args)
+    weekly_summary_weekday = normalize_weekly_summary_day(args.weekly_summary_day)
 
     for target_date in target_dates:
         run_daily_workflow(
@@ -205,6 +239,7 @@ def main() -> None:
             sleep_hours=args.sleep_hours,
             send_feishu=not args.no_feishu,
             dry_run=args.dry_run,
+            weekly_summary_weekday=weekly_summary_weekday,
         )
 
 

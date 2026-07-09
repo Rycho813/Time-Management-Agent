@@ -83,6 +83,21 @@ def get_block_children(block_id: str) -> list[dict]:
 def rich_text_to_plain(rich_text_items: list[dict]) -> str:
     return "".join(item.get("plain_text", "") for item in rich_text_items)
 
+def get_page_rich_text_property_plain_text(page: dict, prop_name: str) -> str:  # 新增
+    prop = page.get("properties", {}).get(prop_name, {})
+    rich_text_items = prop.get("rich_text", [])
+    return rich_text_to_plain(rich_text_items).strip()
+
+def read_rich_text_property_by_date(target_date: str, prop_name: str) -> str | None:  # 新增
+    pages = query_database_pages_by_date(target_date)
+
+    if not pages:
+        return None
+
+    if len(pages) > 1:
+        print(f"警告：{target_date} 找到多条数据库记录，只使用第一条")
+
+    return get_page_rich_text_property_plain_text(pages[0], prop_name)
 
 def get_block_plain_text(block: dict) -> str:
     block_type = block.get("type")
