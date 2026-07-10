@@ -3,7 +3,7 @@ name: Daily Time Report
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "43 5 * * *"
       timezone: "Asia/Singapore"
 
 permissions:
@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 15
 
     env:
+      LLM_PROVIDER: gemini
       NOTION_NAME_PROP: ${{ vars.NOTION_NAME_PROP }}
       NOTION_DATE_PROP: ${{ vars.NOTION_DATE_PROP }}
       NOTION_SNAPSHOT_PROP: ${{ vars.NOTION_SNAPSHOT_PROP }}

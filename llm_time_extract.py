@@ -4,11 +4,10 @@ import json
 import requests
 from dotenv import load_dotenv
 from notion_read import read_notion_texts
-from google import genai
 import time
 
 load_dotenv()
-
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama").strip().lower()
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:4b")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -69,6 +68,79 @@ def call_gemini_with_retry(client, prompt: str, max_retries: int = 5):
             print(f"Gemini 临时不可用，第 {attempt} 次失败，{wait_seconds} 秒后重试...")
             time.sleep(wait_seconds)
 
+def call_ollama(prompt: str) -> str:
+    payload = {
+        "model": OLLAMA_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False,
+        "format": TIME_EXTRACTION_SCHEMA,
+        "options": {"temperature": 0},
+    }
+
+    try:
+        response = requests.post(
+            f"{OLLAMA_BASE_URL}/api/chat",
+            json=payload,
+            timeout=120,
+        )
+    except requests.RequestException as exc:
+        raise RuntimeError(f"无法连接 Ollama：{exc}") from exc
+
+    if response.status_code != 200:
+        print("Ollama 调用失败")
+        print("Status code:", response.status_code)
+        print(response.text)
+        raise SystemExit(1)
+
+    try:
+        return response.json()["message"]["content"]
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RuntimeError("Ollama 返回结果格式异常") from exc
+
+
+def call_gemini(prompt: str) -> str:
+    if not GEMINI_API_KEY:
+        raise RuntimeError("当前选择 Gemini，但缺少 GEMINI_API_KEY")
+
+    try:
+        from google import genai
+    except ImportError as exc:
+        raise RuntimeError(
+            "缺少 google-genai，请执行：python -m pip install google-genai"
+        ) from exc
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
+
+    try:
+        response = call_gemini_with_retry(client, prompt)
+    except Exception as exc:
+        print("Gemini 调用失败")
+        print(exc)
+        raise SystemExit(1)
+
+    if not response.text:
+        raise RuntimeError("Gemini 返回内容为空")
+
+    return response.text
+
+
+def call_llm(prompt: str) -> str:
+    print(f"当前 LLM Provider：{LLM_PROVIDER}")
+
+    if LLM_PROVIDER == "ollama":
+        print(f"当前使用模型：{OLLAMA_MODEL}")
+        return call_ollama(prompt)
+
+    if LLM_PROVIDER == "gemini":
+        print(f"当前使用模型：{GEMINI_MODEL}")
+        return call_gemini(prompt)
+
+    raise RuntimeError(
+        f"不支持的 LLM_PROVIDER：{LLM_PROVIDER}；"
+        "目前只支持 ollama 或 gemini"
+    )
+
+
 def extract_time_info(texts: list[str]) -> dict:
     if not texts:
         return {"items": []}
@@ -98,34 +170,7 @@ def extract_time_info(texts: list[str]) -> dict:
 {raw_text}
 """.strip()
 
-    # payload = {                                       #这里是使用ollama里的本地模型
-    #     "model": OLLAMA_MODEL,
-    #     "messages": [{"role": "user", "content": prompt}],
-    #     "stream": False,
-    #     "format": TIME_EXTRACTION_SCHEMA,
-    #     "options": {"temperature": 0},
-    # }
-
-    # response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=120)
-    # if response.status_code != 200:
-    #     print("Ollama 调用失败")
-    #     print("Status code:", response.status_code)
-    #     print(response.text)
-    #     raise SystemExit(1)
-
-    # content = response.json()["message"]["content"]
-
-    client = genai.Client(api_key=GEMINI_API_KEY)           #这里是使用google的gemini在线模型
-
-    try:  
-        response = call_gemini_with_retry(client, prompt)
-    except Exception as exc:  
-        print("Gemini 调用失败")  
-        print(exc)  
-        raise SystemExit(1)  
-
-    content = response.text  
-
+    content = call_llm(prompt)
     try:
         return json.loads(content)
     except json.JSONDecodeError:
