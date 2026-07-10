@@ -27,6 +27,10 @@ from time_comparison import (
     normalize_weekly_summary_day,
 )
 from feishu_report import send_feishu_text
+from project_tracker import (
+    get_existing_project_names,
+    update_projects_for_day,
+)
 
 load_dotenv()
 
@@ -60,16 +64,16 @@ def resolve_target_dates(args) -> list[str]:
 
     return [get_relative_date_str(args.default_date_offset)]
 
-def get_current_local_date() -> date:  # 修改后：新增
-    try:  # 修改后
-        return datetime.now(ZoneInfo(APP_TIMEZONE)).date()  # 修改后
-    except ZoneInfoNotFoundError:  # 修改后
-        print(f"警告：当前 Python 环境缺少时区数据库，暂时使用本机本地日期；建议执行：python -m pip install tzdata")  # 修改后
-        return datetime.now().date()  # 修改后
+def get_current_local_date() -> date:
+    try:
+        return datetime.now(ZoneInfo(APP_TIMEZONE)).date()
+    except ZoneInfoNotFoundError:
+        print(f"警告：当前 Python 环境缺少时区数据库，暂时使用本机本地日期；建议执行：python -m pip install tzdata")
+        return datetime.now().date()
 
 
-def get_relative_date_str(days_offset: int = -1) -> str:  # 修改后：新增
-    return (get_current_local_date() + timedelta(days=days_offset)).isoformat()  # 修改后
+def get_relative_date_str(days_offset: int = -1) -> str:
+    return (get_current_local_date() + timedelta(days=days_offset)).isoformat()
 
 def validate_sleep_hours(sleep_hours: float) -> int:
     sleep_minutes = int(round(sleep_hours * 60))
@@ -94,13 +98,29 @@ def generate_snapshot_and_summary(
         raise RuntimeError(f"{target_date} 没有可读取的层级文本，无法生成 AI 总结")
 
     print(f"准备用 AI 抽取 {target_date} 的活动和时长...\n")
-    extraction_result = extract_time_info(hierarchical_texts)
+
+    existing_project_names = get_existing_project_names()
+
+    extraction_result = extract_time_info(
+        hierarchical_texts,
+        existing_project_names=existing_project_names,
+    )
     items = normalize_items(extraction_result.get("items", []))
+
+    completion_report = update_projects_for_day(
+        target_date,
+        items,
+    )
 
     snapshot = build_activity_snapshot(target_date, items)
     summary = build_summary(target_date, items, sleep_minutes)
 
-    current_stats = build_current_stats(target_date, items, sleep_minutes)
+    current_stats = build_current_stats(
+        target_date,
+        items,
+        sleep_minutes,
+    )
+
     comparison_sections = build_comparison_sections(
         target_date=target_date,
         current_stats=current_stats,
@@ -110,6 +130,9 @@ def generate_snapshot_and_summary(
 
     if comparison_sections:
         summary = f"{summary}\n\n{comparison_sections}"
+
+    if completion_report:
+        summary = f"{summary}\n\n{completion_report}"
 
     print(f"\n准备写入 {target_date} 的 Activity Snapshot 和 summary...\n")
     update_page_rich_text_properties(
@@ -122,6 +145,7 @@ def generate_snapshot_and_summary(
 
     print(f"已写入 AI 总结：{target_date}")
     return snapshot, summary
+
 
 def run_daily_workflow(
     target_date: str,
@@ -138,7 +162,7 @@ def run_daily_workflow(
     print(f"\n开始执行 {target_date} 的日程迁移与总结流程")
     print(f"当前时区：{APP_TIMEZONE}")
     print(f"睡觉时间：{sleep_hours}h")
-    print(f"周总结触发日：{format_weekday_cn(weekly_summary_weekday)}")  # 新增
+    print(f"周总结触发日：{format_weekday_cn(weekly_summary_weekday)}")
 
     page_id, source_block_id = migrate_single_day(
         target_date=target_date,
@@ -161,7 +185,7 @@ def run_daily_workflow(
         page_id=page_id,
         source_block_id=source_block_id,
         sleep_minutes=sleep_minutes,
-        weekly_summary_weekday=weekly_summary_weekday,  # 新增
+        weekly_summary_weekday=weekly_summary_weekday,
     )
 
     report = build_feishu_report(target_date, snapshot, summary)
@@ -190,7 +214,7 @@ def main() -> None:
         "--default-date-offset",
         type=int,
         default=-1,
-        help="不传 --date / --start / --end 时的默认日期偏移；-1 表示昨天，0 表示今天，默认 -1",  # 修改后
+        help="不传 --date / --start / --end 时的默认日期偏移；-1 表示昨天，0 表示今天，默认 -1",
     )
     parser.add_argument(
         "--overwrite-body",

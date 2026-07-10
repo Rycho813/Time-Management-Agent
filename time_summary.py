@@ -18,8 +18,7 @@ def format_percent(numerator_min: int, denominator_min: int) -> str:
         return "0.0%"
     return f"{numerator_min / denominator_min * 100:.1f}%"
 
-
-def normalize_items(items: list[dict]) -> list[dict]:
+def normalize_items(items: list[dict]) -> list[dict]:  
     valid_items = []
 
     for item in items:
@@ -27,6 +26,10 @@ def normalize_items(items: list[dict]) -> list[dict]:
             event_name = str(item["event_name"]).strip()
             duration_min = int(item["duration_min"])
             time_type = str(item["time_type"]).strip()
+            project_name = str(item.get("project_name", "")).strip()  
+            project_status = str(
+                item.get("project_status", "none")
+            ).strip().lower()  
         except (KeyError, TypeError, ValueError):
             continue
 
@@ -36,19 +39,26 @@ def normalize_items(items: list[dict]) -> list[dict]:
         if time_type not in {"effective", "buffer", "ignored"}:
             continue
 
+        if project_status not in {"open", "closed", "none"}:  
+            project_status = "none"
+
+        if not project_name:  
+            project_status = "none"
+
         valid_items.append(
             {
                 "event_name": event_name,
                 "duration_min": duration_min,
                 "time_type": time_type,
+                "project_name": project_name,  
+                "project_status": project_status,  
                 "evidence": str(item.get("evidence", "")).strip(),
             }
         )
 
     return valid_items
 
-
-def build_activity_snapshot(target_date: str, items: list[dict]) -> str:
+def build_activity_snapshot(target_date: str, items: list[dict]) -> str:  
     lines = [f"【Activity Snapshot｜{target_date}】"]
 
     if not items:
@@ -64,10 +74,18 @@ def build_activity_snapshot(target_date: str, items: list[dict]) -> str:
     for item in items:
         label = label_map[item["time_type"]]
         duration = format_minutes(item["duration_min"])
-        lines.append(f"- [{label}] {item['event_name']}：{duration}")
+
+        project_text = (
+            f"[{item['project_name']}]"
+            if item["project_name"]
+            else ""
+        )
+
+        lines.append(
+            f"- [{label}]{project_text} {item['event_name']}：{duration}"
+        )
 
     return "\n".join(lines)
-
 
 def build_summary(target_date: str, items: list[dict], sleep_minutes: int) -> str:
     denominator_min = 24 * 60 - sleep_minutes
@@ -108,13 +126,10 @@ def build_summary(target_date: str, items: list[dict], sleep_minutes: int) -> st
 
     return "\n".join(lines)
 
-def get_weekday_cn(target_date: str) -> str:  # 修改后：新增
+def get_weekday_cn(target_date: str) -> str:
     weekday_map = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
     return weekday_map[date.fromisoformat(target_date).weekday()]
 
-# def build_feishu_report(target_date: str, snapshot: str, summary: str) -> str:
-#     return f"【时间管理日报｜{target_date}】\n\n{summary}\n\n{snapshot}"
-
-def build_feishu_report(target_date: str, snapshot: str, summary: str) -> str:  # 修改后
-    weekday = get_weekday_cn(target_date)  # 修改后
-    return f"【时间管理日报｜{target_date} {weekday}】\n\n{summary}\n\n{snapshot}"  # 修改后
+def build_feishu_report(target_date: str, snapshot: str, summary: str) -> str:
+    weekday = get_weekday_cn(target_date)
+    return f"【时间管理日报｜{target_date} {weekday}】\n\n{summary}\n\n{snapshot}"

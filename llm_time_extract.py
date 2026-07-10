@@ -27,9 +27,21 @@ TIME_EXTRACTION_SCHEMA = {
                         "type": "string",
                         "enum": ["effective", "buffer", "ignored"],
                     },
+                    "project_name": {"type": "string"},
+                    "project_status": {
+                        "type": "string",
+                        "enum": ["open", "closed", "none"],
+                    },
                     "evidence": {"type": "string"},
                 },
-                "required": ["event_name", "duration_min", "time_type", "evidence"],
+                "required": [
+                    "event_name",
+                    "duration_min",
+                    "time_type",
+                    "project_name",
+                    "project_status",
+                    "evidence",
+                ],
             },
         }
     },
@@ -140,37 +152,53 @@ def call_llm(prompt: str) -> str:
         "目前只支持 ollama 或 gemini"
     )
 
-
-def extract_time_info(texts: list[str]) -> dict:
+def extract_time_info(
+    texts: list[str],
+    existing_project_names: list[str] | None = None,
+) -> dict:
     if not texts:
         return {"items": []}
 
-    if not GEMINI_API_KEY:
-        raise RuntimeError("缺少 GEMINI_API_KEY，请检查 .env")
-
     raw_text = "\n".join(texts)
+    existing_projects_text = json.dumps(
+        existing_project_names or [],
+        ensure_ascii=False,
+    )
 
     prompt = f"""
 你是一个时间记录抽取器。请从下面的碎碎念中抽取所有带有明确时长的活动。/no_think
 
 分类规则：
 1. effective：写代码、项目、阅读、学习、看书、面试准备、简历相关等真正推进目标的活动。
-2. buffer：游戏、刷手机。
-3. ignored：吃饭、洗澡、通勤、睡觉、购物、家务、必要生活事务、休息、旅游。
+2. buffer：游戏、刷手机、吃饭、洗澡、通勤、睡觉、购物、家务、必要生活事务、休息、旅游。
+3. ignored：所有其他活动。
+
+项目规则：
+1. project_name 填写活动所属的长期项目名称；不属于明确项目时填写空字符串。
+2. 优先从“已有项目名称”中选择完全一致的名称，不要擅自改写已有项目名称。
+3. event_name 只填写当天具体做的事项，不要重复 project_name。
+4. 有项目且项目仍在进行时，project_status 填 open。
+5. 只有原文明确表示“整个项目已经完成、结项或全部结束”时，project_status 才填 closed。
+6. 仅仅完成某个功能、模块、步骤或当天任务，不代表整个项目完成，仍填 open。
+7. 没有项目名称时，project_status 必须填 none。
 
 输出要求：
 1. 只抽取有明确时长的活动；没有明确时长就不要抽取。
 2. duration_min 必须换算成分钟，例如 1h=60，2小时=120，半小时=30。
 3. time_type 必须严格从 effective、buffer、ignored 三者中选择一个。
-4. 不要编造原文没有的活动或时长。
+4. 不要编造原文没有的活动、项目、状态或时长。
 5. evidence 必须填写原文依据。
 6. 只输出 JSON，不要输出解释文字。
+
+已有项目名称：
+{existing_projects_text}
 
 原始文本：
 {raw_text}
 """.strip()
 
     content = call_llm(prompt)
+
     try:
         return json.loads(content)
     except json.JSONDecodeError:
