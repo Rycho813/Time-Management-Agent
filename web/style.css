@@ -234,12 +234,61 @@ body {
 }
 
 @media (max-width: 760px) {
+    :root {
+        --week-cell-size: 5px; /* 修改后：手机端缩小周格子 */
+        --week-gap: 1px;       /* 修改后：手机端缩小格子间距 */
+    }
+
+    body {
+        padding: 12px; /* 修改后：减小页面左右留白 */
+    }
+
     .page-header {
         display: block;
+        margin-bottom: 12px; /* 修改后 */
+    }
+
+    .page-header h1 {
+        font-size: 28px; /* 新增：防止标题过大 */
+    }
+
+    .page-header p {
+        font-size: 14px; /* 新增 */
+        line-height: 1.5;
     }
 
     .legend {
-        margin-top: 12px;
+        gap: 10px;       /* 修改后 */
+        margin-top: 10px;
+        font-size: 12px; /* 修改后 */
+    }
+
+    .legend-color {
+        width: 10px;  /* 修改后 */
+        height: 10px; /* 修改后 */
+    }
+
+    .calendar-panel {
+        width: 100%;
+        max-height: none;  /* 修改后：手机端不再限制成一个小窗口 */
+        padding: 6px;      /* 修改后 */
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .year-row {
+        gap: 4px; /* 修改后 */
+    }
+
+    .year-label {
+        width: 22px;      /* 修改后 */
+        flex: 0 0 22px;   /* 修改后 */
+        font-size: 8px;   /* 修改后 */
+    }
+
+    .week-cell:hover {
+        transform: none; /* 新增：手机端取消无意义的 hover 放大 */
     }
 
     .day-grid {

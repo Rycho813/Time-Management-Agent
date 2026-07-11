@@ -1,15 +1,160 @@
 {
   "version": 1,
   "days": {
-    "2026-07-10": {
-      "effective_minutes": 349,
+    "2026-05-20": {
+      "effective_minutes": 0,
       "status": "complete",
-      "updated_at": "2026-07-11T06:18:51.452205+00:00"
+      "updated_at": "2026-07-11T08:10:24.040186+00:00"
+    },
+    "2026-05-21": {
+      "effective_minutes": 116,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:11:20.343134+00:00"
+    },
+    "2026-05-22": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:12:25.701285+00:00"
+    },
+    "2026-06-04": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:13:51.191661+00:00"
+    },
+    "2026-06-10": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:15:00.933071+00:00"
+    },
+    "2026-06-11": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:15:51.440865+00:00"
+    },
+    "2026-06-12": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:16:43.663812+00:00"
+    },
+    "2026-06-13": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:17:27.258854+00:00"
+    },
+    "2026-06-14": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:18:27.484244+00:00"
+    },
+    "2026-06-16": {
+      "effective_minutes": 287,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:19:43.569258+00:00"
+    },
+    "2026-06-17": {
+      "effective_minutes": 86,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:21:13.755394+00:00"
+    },
+    "2026-06-18": {
+      "effective_minutes": 145,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:22:19.477537+00:00"
+    },
+    "2026-06-22": {
+      "effective_minutes": 127,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:23:26.464858+00:00"
+    },
+    "2026-06-23": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:24:26.129034+00:00"
+    },
+    "2026-06-24": {
+      "effective_minutes": 262,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:25:58.657425+00:00"
+    },
+    "2026-06-25": {
+      "effective_minutes": 338,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:27:32.655459+00:00"
+    },
+    "2026-06-26": {
+      "effective_minutes": 255,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:28:48.647903+00:00"
+    },
+    "2026-06-27": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:29:47.769474+00:00"
+    },
+    "2026-06-28": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:31:40.646695+00:00"
+    },
+    "2026-06-29": {
+      "effective_minutes": 278,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:34:04.423592+00:00"
+    },
+    "2026-06-30": {
+      "effective_minutes": 379,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:36:18.336987+00:00"
+    },
+    "2026-07-01": {
+      "effective_minutes": 180,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:37:12.539656+00:00"
+    },
+    "2026-07-02": {
+      "effective_minutes": 123,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:38:07.769673+00:00"
+    },
+    "2026-07-03": {
+      "effective_minutes": 198,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:39:10.282274+00:00"
+    },
+    "2026-07-04": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:40:12.412420+00:00"
+    },
+    "2026-07-05": {
+      "effective_minutes": 0,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:41:33.173601+00:00"
+    },
+    "2026-07-06": {
+      "effective_minutes": 194,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:43:00.400052+00:00"
+    },
+    "2026-07-07": {
+      "effective_minutes": 271,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:44:21.094545+00:00"
+    },
+    "2026-07-08": {
+      "effective_minutes": 306,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:45:40.307749+00:00"
     },
     "2026-07-09": {
       "effective_minutes": 369,
       "status": "complete",
-      "updated_at": "2026-07-11T05:56:35.547740+00:00"
+      "updated_at": "2026-07-11T08:47:07.371035+00:00"
+    },
+    "2026-07-10": {
+      "effective_minutes": 349,
+      "status": "complete",
+      "updated_at": "2026-07-11T08:48:46.500453+00:00"
     }
   }
 }

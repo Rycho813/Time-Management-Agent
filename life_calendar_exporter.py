@@ -7,7 +7,7 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
-
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,6 +19,54 @@ WEB_OUTPUT_PATH = ROOT_DIR / "web" / "data" / "life_calendar.json"
 
 TOTAL_LIFE_WEEKS = 90 * 52
 
+def normalize_week_days(
+    week_start,
+    existing_days
+):
+    """
+    保证每周一定生成7天数据
+    没有记录的日期补0
+    """
+
+    existing_map = {
+        day["date"]: day
+        for day in existing_days
+    }
+
+    full_week = []
+
+
+    for i in range(7):
+
+        current_date = (
+            week_start +
+            timedelta(days=i)
+        )
+
+        date_str = current_date.strftime(
+            "%Y-%m-%d"
+        )
+
+
+        if date_str in existing_map:
+
+            full_week.append(
+                existing_map[date_str]
+            )
+
+        else:
+
+            full_week.append(
+                {
+                    "date": date_str,
+                    "effective_minutes": 0,
+                    "status": "missing",
+                    "summary": "无记录，默认有效利用时间为0"
+                }
+            )
+
+
+    return full_week
 
 def require_birth_date() -> date:
     birth_date_text = os.getenv("LIFE_BIRTH_DATE", "").strip()
@@ -141,6 +189,40 @@ def get_level(
 
     return "high"
 
+def fill_missing_days(week_start, existing_days):
+    """
+    补齐一周7天，没有记录的日期默认有效时间为0
+    """
+
+    existing_map = {
+        day["date"]: day
+        for day in existing_days
+    }
+
+    full_week = []
+
+    for i in range(7):
+        current_date = (
+            week_start + timedelta(days=i)
+        )
+
+        date_str = current_date.strftime("%Y-%m-%d")
+
+        if date_str in existing_map:
+            full_week.append(
+                existing_map[date_str]
+            )
+        else:
+            full_week.append(
+                {
+                    "date": date_str,
+                    "effective_minutes": 0,
+                    "status": "missing"
+                }
+            )
+
+    return full_week
+
 
 def build_calendar_output(
     daily_store: dict[str, Any],
@@ -197,14 +279,16 @@ def build_calendar_output(
     output_weeks: list[dict[str, Any]] = []
 
     for week_start, week_days in sorted(grouped_days.items()):
-        recorded_days = [
-            day
-            for day in week_days
-            if day["status"] == "complete"
-        ]
 
-        if not recorded_days:
-            continue
+        full_week_days = normalize_week_days(
+            week_start,
+            week_days
+        )
+
+        effective_minutes = sum(
+            day["effective_minutes"]
+            for day in full_week_days
+        )
 
         life_week_index = (
             week_start - birth_week_start
@@ -213,19 +297,27 @@ def build_calendar_output(
         if not 0 <= life_week_index < TOTAL_LIFE_WEEKS:
             continue
 
-        effective_minutes = sum(
-            day["effective_minutes"]
-            for day in recorded_days
-        )
-
         denominator_minutes = (
-            awake_minutes * len(recorded_days)
+            awake_minutes * 7
         )
 
         utilization = (
             effective_minutes / denominator_minutes
             if denominator_minutes > 0
             else 0.0
+        )
+
+        total_effective_minutes = sum(
+            day["effective_minutes"]
+            for day in full_week_days
+        )
+
+        average_effective_minutes = round(
+            total_effective_minutes / 7
+        )
+
+        average_utilization = (
+            total_effective_minutes/(awake_minutes * 7)
         )
 
         iso_year, iso_week, _ = week_start.isocalendar()
@@ -238,12 +330,12 @@ def build_calendar_output(
                 "week_end": (
                     week_start + timedelta(days=6)
                 ).isoformat(),
-                "effective_minutes": effective_minutes,
-                "recorded_days": len(recorded_days),
-                "denominator_minutes": denominator_minutes,
-                "utilization": round(utilization, 6),
+                "total_effective_minutes": total_effective_minutes,
+                "average_effective_minutes": average_effective_minutes,
+                "recorded_days": len(full_week_days),
+                "average_utilization": round(average_utilization, 6),
                 "level": get_level(
-                    utilization,
+                    average_utilization,
                     low_threshold,
                     high_threshold,
                 ),

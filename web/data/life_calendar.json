@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-07-11T06:18:51.452628+00:00",
+  "generated_at": "2026-07-11T08:48:46.503621+00:00",
   "config": {
     "birth_date": "2000-08-13",
     "awake_minutes_per_day": 1020,
@@ -15,6 +15,238 @@
     }
   },
   "days": [
+    {
+      "date": "2026-05-20",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-05-21",
+      "effective_minutes": 116,
+      "denominator_minutes": 1020,
+      "utilization": 0.113725,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-05-22",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-04",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-10",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-11",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-12",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-13",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-14",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-16",
+      "effective_minutes": 287,
+      "denominator_minutes": 1020,
+      "utilization": 0.281373,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-17",
+      "effective_minutes": 86,
+      "denominator_minutes": 1020,
+      "utilization": 0.084314,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-18",
+      "effective_minutes": 145,
+      "denominator_minutes": 1020,
+      "utilization": 0.142157,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-22",
+      "effective_minutes": 127,
+      "denominator_minutes": 1020,
+      "utilization": 0.12451,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-23",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-24",
+      "effective_minutes": 262,
+      "denominator_minutes": 1020,
+      "utilization": 0.256863,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-25",
+      "effective_minutes": 338,
+      "denominator_minutes": 1020,
+      "utilization": 0.331373,
+      "level": "medium",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-26",
+      "effective_minutes": 255,
+      "denominator_minutes": 1020,
+      "utilization": 0.25,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-27",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-28",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-29",
+      "effective_minutes": 278,
+      "denominator_minutes": 1020,
+      "utilization": 0.272549,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-06-30",
+      "effective_minutes": 379,
+      "denominator_minutes": 1020,
+      "utilization": 0.371569,
+      "level": "medium",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-01",
+      "effective_minutes": 180,
+      "denominator_minutes": 1020,
+      "utilization": 0.176471,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-02",
+      "effective_minutes": 123,
+      "denominator_minutes": 1020,
+      "utilization": 0.120588,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-03",
+      "effective_minutes": 198,
+      "denominator_minutes": 1020,
+      "utilization": 0.194118,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-04",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-05",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-06",
+      "effective_minutes": 194,
+      "denominator_minutes": 1020,
+      "utilization": 0.190196,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-07",
+      "effective_minutes": 271,
+      "denominator_minutes": 1020,
+      "utilization": 0.265686,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-08",
+      "effective_minutes": 306,
+      "denominator_minutes": 1020,
+      "utilization": 0.3,
+      "level": "medium",
+      "status": "complete"
+    },
     {
       "date": "2026-07-09",
       "effective_minutes": 369,
@@ -34,15 +266,81 @@
   ],
   "weeks": [
     {
-      "life_week_index": 1352,
+      "life_week_index": 1377,
+      "iso_week": "2026年第21周",
+      "week_start": "2026-05-18",
+      "week_end": "2026-05-24",
+      "total_effective_minutes": 116,
+      "average_effective_minutes": 17,
+      "recorded_days": 7,
+      "average_utilization": 0.016246,
+      "level": "low"
+    },
+    {
+      "life_week_index": 1379,
+      "iso_week": "2026年第23周",
+      "week_start": "2026-06-01",
+      "week_end": "2026-06-07",
+      "total_effective_minutes": 0,
+      "average_effective_minutes": 0,
+      "recorded_days": 7,
+      "average_utilization": 0.0,
+      "level": "low"
+    },
+    {
+      "life_week_index": 1380,
+      "iso_week": "2026年第24周",
+      "week_start": "2026-06-08",
+      "week_end": "2026-06-14",
+      "total_effective_minutes": 0,
+      "average_effective_minutes": 0,
+      "recorded_days": 7,
+      "average_utilization": 0.0,
+      "level": "low"
+    },
+    {
+      "life_week_index": 1381,
+      "iso_week": "2026年第25周",
+      "week_start": "2026-06-15",
+      "week_end": "2026-06-21",
+      "total_effective_minutes": 518,
+      "average_effective_minutes": 74,
+      "recorded_days": 7,
+      "average_utilization": 0.072549,
+      "level": "low"
+    },
+    {
+      "life_week_index": 1382,
+      "iso_week": "2026年第26周",
+      "week_start": "2026-06-22",
+      "week_end": "2026-06-28",
+      "total_effective_minutes": 982,
+      "average_effective_minutes": 140,
+      "recorded_days": 7,
+      "average_utilization": 0.137535,
+      "level": "low"
+    },
+    {
+      "life_week_index": 1383,
+      "iso_week": "2026年第27周",
+      "week_start": "2026-06-29",
+      "week_end": "2026-07-05",
+      "total_effective_minutes": 1158,
+      "average_effective_minutes": 165,
+      "recorded_days": 7,
+      "average_utilization": 0.162185,
+      "level": "low"
+    },
+    {
+      "life_week_index": 1384,
       "iso_week": "2026年第28周",
       "week_start": "2026-07-06",
       "week_end": "2026-07-12",
-      "effective_minutes": 718,
-      "recorded_days": 2,
-      "denominator_minutes": 2040,
-      "utilization": 0.351961,
-      "level": "medium"
+      "total_effective_minutes": 1489,
+      "average_effective_minutes": 213,
+      "recorded_days": 7,
+      "average_utilization": 0.208543,
+      "level": "low"
     }
   ]
 }

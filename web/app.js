@@ -113,13 +113,24 @@ function calculateCurrentLifeWeekIndex() {
 }
 
 function buildWeekTooltip(week) {
+    const lifeYearIndex = Math.floor(
+        week.life_week_index / WEEKS_PER_ROW
+    ); // 修改后
+
+    const weekInLifeYear =
+        week.life_week_index % WEEKS_PER_ROW + 1; // 修改后
+
     return `
-        <strong>${week.iso_week}</strong><br>
+        <strong>${week.iso_week}（公历周）</strong><br>
         人生第 ${week.life_week_index + 1} 周<br>
         ${week.week_start} ～ ${week.week_end}<br>
-        有效时间：${formatMinutes(week.effective_minutes)}<br>
-        利用率：${formatPercent(week.utilization)}<br>
-        记录完整度：${week.recorded_days}/7天
+        平均有效时间：${formatMinutes(
+            week.average_effective_minutes
+        )}<br>
+        平均利用率：${formatPercent(
+            week.average_utilization
+        )}<br>
+        有效记录：${week.recorded_days}/7天
     `;
 }
 
@@ -166,7 +177,7 @@ function renderCalendar() {
                 cell.appendChild(
                     createFillElement(
                         "week-fill",
-                        week.utilization,
+                        week.average_utilization,
                         week.level
                     )
                 );
@@ -192,8 +203,8 @@ function openWeekModal(week) {
 
     modalSummaryElement.textContent =
         `${week.week_start} ～ ${week.week_end}；` +
-        `有效时间 ${formatMinutes(week.effective_minutes)}；` +
-        `利用率 ${formatPercent(week.utilization)}。`;
+        `平均有效时间 ${formatMinutes(week.average_effective_minutes)}；` +
+        `平均利用率 ${formatPercent(week.average_utilization)}。` + `有效记录 ${week.recorded_days}/7天。`;
 
     dayGridElement.replaceChildren();
 
