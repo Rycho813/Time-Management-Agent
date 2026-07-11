@@ -32,6 +32,8 @@ from project_tracker import (
     update_projects_for_day,
 )
 
+from life_calendar_exporter import update_life_calendar_from_items
+
 load_dotenv()
 
 APP_TIMEZONE = os.getenv("APP_TIMEZONE", "Asia/Singapore")
@@ -144,6 +146,12 @@ def generate_snapshot_and_summary(
     )
 
     print(f"已写入 AI 总结：{target_date}")
+
+    update_life_calendar_from_items(
+        target_date=target_date,
+        items=items,
+    )
+    
     return snapshot, summary
 
 

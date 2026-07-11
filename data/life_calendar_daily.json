@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "days": {
+    "2026-07-10": {
+      "effective_minutes": 349,
+      "status": "complete",
+      "updated_at": "2026-07-11T05:45:37.650729+00:00"
+    },
+    "2026-07-09": {
+      "effective_minutes": 369,
+      "status": "complete",
+      "updated_at": "2026-07-11T05:56:35.547740+00:00"
+    }
+  }
+}

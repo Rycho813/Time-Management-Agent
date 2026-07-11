@@ -7,7 +7,9 @@ on:
       timezone: "Asia/Singapore"
 
 permissions:
-  contents: read
+  contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: daily-time-report
@@ -37,6 +39,14 @@ jobs:
       FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
       PROJECT_DATABASE_ID: ${{ secrets.PROJECT_DATABASE_ID }}
 
+      LIFE_BIRTH_DATE: ${{ vars.LIFE_BIRTH_DATE }}
+      LIFE_AWAKE_MINUTES: ${{ vars.LIFE_AWAKE_MINUTES }}
+      LIFE_LOW_THRESHOLD: ${{ vars.LIFE_LOW_THRESHOLD }}
+      LIFE_HIGH_THRESHOLD: ${{ vars.LIFE_HIGH_THRESHOLD }}
+      LIFE_COLOR_LOW: ${{ vars.LIFE_COLOR_LOW }}
+      LIFE_COLOR_MEDIUM: ${{ vars.LIFE_COLOR_MEDIUM }}
+      LIFE_COLOR_HIGH: ${{ vars.LIFE_COLOR_HIGH }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,3 +65,39 @@ jobs:
       - name: Run daily migration and summary
         run: |
           python migrate_and_summary.py
+
+      - name: Save Life Calendar data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/life_calendar_daily.json
+          git add web/data/life_calendar.json
+
+          if git diff --cached --quiet; then
+            echo "Life Calendar data has no changes."
+          else
+            git commit -m "Update Life Calendar data"
+            git push origin HEAD:${{ github.event.repository.default_branch }}
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: web
+
+  deploy-pages:
+    needs: run-daily-report
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy Life Calendar
+        id: deployment
+        uses: actions/deploy-pages@v4

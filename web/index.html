@@ -1,0 +1,57 @@
+<!-- 新增代码：web/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=10.0"
+    >
+    <title>Life Calendar</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <header class="page-header">
+        <div>
+            <h1>Life Calendar</h1>
+            <p>每个格子代表一周，填充比例代表清醒时间利用率。</p>
+        </div>
+
+        <div class="legend">
+            <span><i class="legend-color low"></i>低于30%</span>
+            <span><i class="legend-color medium"></i>30%～60%</span>
+            <span><i class="legend-color high"></i>高于60%</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="calendar-panel">
+            <div id="life-calendar" class="life-calendar"></div>
+        </section>
+    </main>
+
+    <div id="tooltip" class="tooltip hidden"></div>
+
+    <div id="week-modal" class="modal hidden">
+        <div class="modal-mask" data-close-modal></div>
+
+        <section class="modal-content">
+            <button
+                id="close-modal"
+                class="close-button"
+                type="button"
+                aria-label="关闭"
+            >
+                ×
+            </button>
+
+            <h2 id="week-detail-title">本周详情</h2>
+            <p id="week-detail-summary"></p>
+            <div id="day-grid" class="day-grid"></div>
+        </section>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "generated_at": "2026-07-11T05:56:35.550163+00:00",
+  "config": {
+    "birth_date": "2000-01-01",
+    "awake_minutes_per_day": 1020,
+    "thresholds": {
+      "low": 0.3,
+      "high": 0.6
+    },
+    "colors": {
+      "low": "#D9534F",
+      "medium": "#E2B93B",
+      "high": "#46A267"
+    }
+  },
+  "days": [
+    {
+      "date": "2026-07-09",
+      "effective_minutes": 369,
+      "denominator_minutes": 1020,
+      "utilization": 0.361765,
+      "level": "medium",
+      "status": "complete"
+    },
+    {
+      "date": "2026-07-10",
+      "effective_minutes": 349,
+      "denominator_minutes": 1020,
+      "utilization": 0.342157,
+      "level": "medium",
+      "status": "complete"
+    }
+  ],
+  "weeks": [
+    {
+      "life_week_index": 1384,
+      "iso_week": "2026年第28周",
+      "week_start": "2026-07-06",
+      "week_end": "2026-07-12",
+      "effective_minutes": 718,
+      "recorded_days": 2,
+      "denominator_minutes": 2040,
+      "utilization": 0.351961,
+      "level": "medium"
+    }
+  ]
+}
