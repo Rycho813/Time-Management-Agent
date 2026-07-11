@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generated_at": "2026-07-11T08:48:46.503621+00:00",
+  "generated_at": "2026-07-11T10:03:11.461197+00:00",
   "config": {
-    "birth_date": "2000-08-13",
+    "birth_date": "2000-01-01",
     "awake_minutes_per_day": 1020,
     "thresholds": {
       "low": 0.3,
