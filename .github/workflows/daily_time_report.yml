@@ -35,6 +35,7 @@ jobs:
       NOTION_SOURCE_PAGE_ID: ${{ secrets.NOTION_SOURCE_PAGE_ID }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+      PROJECT_DATABASE_ID: ${{ secrets.PROJECT_DATABASE_ID }}
 
     steps:
       - name: Checkout repository
