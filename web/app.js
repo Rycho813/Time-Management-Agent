@@ -129,8 +129,7 @@ function buildWeekTooltip(week) {
         )}<br>
         平均利用率：${formatPercent(
             week.average_utilization
-        )}<br>
-        有效记录：${week.recorded_days}/7天
+        )}
     `;
 }
 
@@ -204,7 +203,7 @@ function openWeekModal(week) {
     modalSummaryElement.textContent =
         `${week.week_start} ～ ${week.week_end}；` +
         `平均有效时间 ${formatMinutes(week.average_effective_minutes)}；` +
-        `平均利用率 ${formatPercent(week.average_utilization)}。` + `有效记录 ${week.recorded_days}/7天。`;
+        `平均利用率 ${formatPercent(week.average_utilization)}。`;
 
     dayGridElement.replaceChildren();
 

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 from datetime import timedelta
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
 load_dotenv()
 
@@ -277,6 +278,9 @@ def build_calendar_output(
         grouped_days[week_start].append(day_record)
 
     output_weeks: list[dict[str, Any]] = []
+    today = datetime.now(
+        ZoneInfo("Asia/Singapore")
+    ).date()
 
     for week_start, week_days in sorted(grouped_days.items()):
 
@@ -285,9 +289,33 @@ def build_calendar_output(
             week_days
         )
 
-        effective_minutes = sum(
+        week_end = week_start + timedelta(days=6)  # 新代码
+
+        if today < week_start:
+            continue
+        elif today > week_end:
+            elapsed_days = 7 
+        else:
+            elapsed_days = (
+                today - week_start
+            ).days + 1 
+
+        calculation_days = full_week_days[
+            :elapsed_days
+        ]
+
+        total_effective_minutes = sum(
             day["effective_minutes"]
-            for day in full_week_days
+            for day in calculation_days
+        )
+
+        average_effective_minutes = round(
+            total_effective_minutes / elapsed_days
+        )
+
+        average_utilization = (
+            total_effective_minutes
+            / (awake_minutes * elapsed_days)
         )
 
         life_week_index = (
@@ -296,29 +324,6 @@ def build_calendar_output(
 
         if not 0 <= life_week_index < TOTAL_LIFE_WEEKS:
             continue
-
-        denominator_minutes = (
-            awake_minutes * 7
-        )
-
-        utilization = (
-            effective_minutes / denominator_minutes
-            if denominator_minutes > 0
-            else 0.0
-        )
-
-        total_effective_minutes = sum(
-            day["effective_minutes"]
-            for day in full_week_days
-        )
-
-        average_effective_minutes = round(
-            total_effective_minutes / 7
-        )
-
-        average_utilization = (
-            total_effective_minutes/(awake_minutes * 7)
-        )
 
         iso_year, iso_week, _ = week_start.isocalendar()
 
