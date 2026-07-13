@@ -2,6 +2,25 @@ name: Daily Time Report
 
 on:
   workflow_dispatch:
+    inputs:
+      target_date:
+        description: "测试日期，格式 YYYY-MM-DD"
+        required: true                   
+        default: "2026-07-11"                    
+        type: string                             
+
+      send_feishu:
+        description: "是否发送飞书报告"           
+        required: true                        
+        default: true                       
+        type: boolean                        
+
+      save_calendar:
+        description: "是否提交 Life Calendar 数据"
+        required: true                      
+        default: false                       
+        type: boolean                      
+
   schedule:
     - cron: "43 5 * * *"
       timezone: "Asia/Singapore"
@@ -62,11 +81,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run daily migration and summary
+      - name: Run scheduled migration and summary
+        if: github.event_name == 'schedule'
         run: |
           python migrate_and_summary.py
 
+      - name: Run manual migration and summary
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ inputs.send_feishu }}" = "true" ]; then
+            python migrate_and_summary.py \
+              --date "${{ inputs.target_date }}"
+          else
+            python migrate_and_summary.py \
+              --date "${{ inputs.target_date }}" \
+              --no-feishu
+          fi
+
       - name: Save Life Calendar data
+        if: github.event_name == 'schedule' || inputs.save_calendar
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
