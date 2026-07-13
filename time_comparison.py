@@ -228,7 +228,7 @@ def build_daily_comparison_section(target_date: str, current_stats: DayStats, su
             build_compare_line(
                 "有效利用时间",
                 current_stats.effective_min,
-                f"上周日均（{len(previous_week_stats)}/7 天）",
+                f"上周日均",
                 previous_week_avg_effective,
                 current_stats.denominator_min,
             )
@@ -273,8 +273,8 @@ def build_weekly_summary_section(
     lines = [
         "【本周周总结】",
         f"触发日：{format_weekday_cn(weekly_summary_weekday)}",
-        f"本周范围：{current_week_start.isoformat()} ~ {current_week_end.isoformat()}（有效记录 {len(current_week_stats)}/7 天）",
-        f"上周范围：{previous_week_start.isoformat()} ~ {previous_week_end.isoformat()}（有效记录 {len(previous_week_stats)}/7 天）",
+        f"本周范围：{current_week_start.isoformat()} ~ {current_week_end.isoformat()}",
+        f"上周范围：{previous_week_start.isoformat()} ~ {previous_week_end.isoformat()}",
     ]
 
     if current_avg_effective is None:
