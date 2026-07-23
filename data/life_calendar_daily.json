@@ -215,6 +215,11 @@
       "effective_minutes": 240,
       "status": "complete",
       "updated_at": "2026-07-22T22:40:44.992400+00:00"
+    },
+    "2026-07-23": {
+      "effective_minutes": 389,
+      "status": "complete",
+      "updated_at": "2026-07-23T22:37:52.863644+00:00"
     }
   }
 }
