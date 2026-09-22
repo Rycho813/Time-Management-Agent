@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-09-22T00:17:23.368151+00:00",
+  "generated_at": "2026-09-22T23:49:17.182390+00:00",
   "config": {
     "birth_date": "2000-01-01",
     "awake_minutes_per_day": 1020,
@@ -766,6 +766,14 @@
       "utilization": 0.296078,
       "level": "low",
       "status": "complete"
+    },
+    {
+      "date": "2026-09-22",
+      "effective_minutes": 241,
+      "denominator_minutes": 1020,
+      "utilization": 0.236275,
+      "level": "low",
+      "status": "complete"
     }
   ],
   "weeks": [
@@ -961,10 +969,10 @@
       "iso_week": "2026年第39周",
       "week_start": "2026-09-21",
       "week_end": "2026-09-27",
-      "total_effective_minutes": 302,
-      "average_effective_minutes": 151,
+      "total_effective_minutes": 543,
+      "average_effective_minutes": 181,
       "recorded_days": 7,
-      "average_utilization": 0.148039,
+      "average_utilization": 0.177451,
       "level": "low"
     }
   ]
