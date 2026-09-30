@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-09-30T09:16:17.987159+00:00",
+  "generated_at": "2026-09-30T09:31:50.036678+00:00",
   "config": {
     "birth_date": "2000-01-01",
     "awake_minutes_per_day": 1020,
@@ -796,6 +796,14 @@
       "effective_minutes": 65,
       "denominator_minutes": 1020,
       "utilization": 0.063725,
+      "level": "low",
+      "status": "complete"
+    },
+    {
+      "date": "2026-09-27",
+      "effective_minutes": 0,
+      "denominator_minutes": 1020,
+      "utilization": 0.0,
       "level": "low",
       "status": "complete"
     },
