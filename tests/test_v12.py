@@ -39,6 +39,12 @@ class Analysis(unittest.TestCase):
         a=activity();a['duration_min']=30
         r=analyze(state(),[a],rules(),START,END,END)
         self.assertIsNone(r['locations'][0]['utilization'])
+    def test_explicit_unknown_location_not_repeated_on_other_days(self):
+        a=activity();a['unmatched_place']='未确认地点'
+        r=analyze(state(),[a],rules(),START,END+86400000,END+86400000)
+        self.assertEqual(len(r['days'][0]['unknown']),1)
+        self.assertEqual(r['days'][1]['unknown'],[])
+
     def test_state_validation(self):
         s=state();s['segments'].append(copy.deepcopy(s['segments'][0]));self.assertRaises(ValueError,validate_state,s)
 

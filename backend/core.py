@@ -70,6 +70,9 @@ def analyze(state,activities,rules,start,end,now):
         seen=set()
         for a in activities:
             if a.get('date') != date and not (a.get('start') is not None and a.get('end') is not None): continue
+            if a.get('start') is not None and a.get('end') is not None:
+                if not integer(a['start']) or not integer(a['end']) or a['end']<=a['start']:raise ValueError('活动区间无效')
+                if a['end']<=left or a['start']>=right:continue
             aid=a.get('id')
             if not isinstance(aid,str) or not aid: raise ValueError('活动必须有来源ID')
             if aid in seen:

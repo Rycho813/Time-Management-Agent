@@ -25,6 +25,7 @@ def duration(text):
 
 def clock(text,day):
     text=text.replace(' ','').removesuffix('开始')
+    text=re.sub(r'^(凌晨|早上|早晨|上午|中午|下午|傍晚|晚上|晚间)[，,、](?=\d)',r'\1',text)
     tomorrow=text.startswith(('次日','第二天'))
     text=re.sub(r'^(次日|第二天)','',text)
     m=re.fullmatch(r'(凌晨|早上|早晨|上午|中午|下午|傍晚|晚上|晚间)?([\d零〇一二两三四五六七八九十]+)(?:[:：]([0-9]{2})|点(?:(半|一刻|三刻)|([\d零〇一二两三四五六七八九十]+)分?)?)',text)
@@ -33,8 +34,12 @@ def clock(text,day):
     minute=int(minute) if minute else {'半':30,'一刻':15,'三刻':45}.get(fraction, int(number(cnminute)) if cnminute else 0)
     if not period and ':' not in text and '：' not in text and hour not in (0,24) and hour<13:raise ValueError('缺少上午或下午，不能猜测')
     if period:
-        if not 0<=hour<=12:raise ValueError('时段和小时冲突')
-        if period in ('下午','傍晚','晚上','晚间'):
+        explicit_24 = (':' in text or '：' in text) and 13<=hour<=23
+        if explicit_24:
+            if period not in ('下午','傍晚','晚上','晚间') or (period in ('晚上','晚间') and hour<18):raise ValueError('时段和小时冲突')
+        elif not 0<=hour<=12:raise ValueError('时段和小时冲突')
+        if explicit_24:pass
+        elif period in ('下午','傍晚','晚上','晚间'):
             if hour in (0,12):raise ValueError('夜间十二点归属不明确，请写凌晨零点及日期')
             hour=hour%12+12
         elif period=='中午':

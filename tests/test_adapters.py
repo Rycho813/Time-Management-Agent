@@ -43,6 +43,13 @@ class TimeForms(unittest.TestCase):
         self.assertEqual(normalize_time('2026-10-28','23:30','00:30','一小时')['time_precision'],'conflict')
         for bad in ['25:00','下午十五点']:
             self.assertRaises(ValueError,normalize_time,'2026-10-28',bad,'10:00')
+    def test_period_with_24_hour_clock_and_separator(self):
+        for text,expected in [('下午14:55','14:55'),('下午16:50','16:50'),('晚上，19:40','19:40'),('晚上,19:40','19:40')]:
+            a=normalize_time('2026-10-28',text,duration_text='半小时')
+            self.assertEqual(a['start'],t('2026-10-28T'+expected))
+        self.assertRaises(ValueError,normalize_time,'2026-10-28','上午14:55','15:25')
+        self.assertRaises(ValueError,normalize_time,'2026-10-28','晚上14:55','15:25')
+
     def test_missing_and_invalid(self):
         for duration in ['0分钟','-1小时','很多小时']:
             self.assertRaises(ValueError,normalize_time,'2026-10-28',duration_text=duration)
