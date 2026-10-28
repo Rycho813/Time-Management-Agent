@@ -1,0 +1,6 @@
+[Unit]
+Description=Time_map isolated test settlement tick
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/timemap-test/current/deploy
+ExecStart=/usr/bin/docker compose --project-name timemap-test run --rm --no-deps worker python -m backend.maintenance settle --db /data/timemap.sqlite3 --since 2026-10-26

@@ -1,0 +1,11 @@
+*
+!backend/
+!backend/**
+!time_summary.py
+!config/
+!config/**
+!requirements-runtime.lock
+!deploy/
+!deploy/Dockerfile
+**/__pycache__
+**/*.pyc

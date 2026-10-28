@@ -1,0 +1,17 @@
+# Additive example only; never replace existing FreshRSS sites.
+timemap.rychoz.com {
+    @api path /v1/* /health
+    handle @api {
+        reverse_proxy 127.0.0.1:18120
+    }
+    handle_path /preview/* {
+        root * /srv/timemap-preview/current
+        file_server
+    }
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        Content-Security-Policy "default-src 'self'; connect-src 'self'; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+    }
+    respond 404
+}

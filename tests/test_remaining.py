@@ -16,7 +16,8 @@ class Remaining(unittest.TestCase):
             ops=[{'table':table,'action':'upsert','id':v['id'],'value':v} for table in ('places','segments') for v in state()[table]]
             db.sync({'batch_id':'1','base_revision':0,'operations':ops})
             db.sync({'batch_id':'2','base_revision':1,'operations':[{'table':'segments','action':'delete','id':'s'}]})
-            page=db.changes(0,1);self.assertTrue(page['has_more']);self.assertEqual(page['next_cursor'],1)
+            page=db.changes(0,1);self.assertTrue(page['has_more']);self.assertEqual(page['next_cursor'],0)
+            self.assertGreater(page['after'],0)
             self.assertEqual(db.changes(1,1)['items'][0]['operations'][0]['action'],'delete')
             self.assertRaises(Conflict,db.sync,{'batch_id':'3','base_revision':2,'operations':ops})
             db.sync({'batch_id':'4','base_revision':2,'operations':ops,'restore_deleted':True})

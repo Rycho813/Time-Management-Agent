@@ -14,6 +14,8 @@ def settle_due(store,now,start_date,close_time='01:30'):
     while day<=last:
         left=int(datetime.combine(day,datetime.min.time(),TZ).timestamp()*1000);right=left+86400000
         with store.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            if db.execute('SELECT revision FROM state WHERE id=1').fetchone()[0]!=revision:raise ValueError('settlement_source_changed')
             old=db.execute('SELECT revision FROM settlements WHERE date=?',(day.isoformat(),)).fetchone()
             if not old or old[0]!=revision:
                 parts=clip(state['segments'],left,right,now)

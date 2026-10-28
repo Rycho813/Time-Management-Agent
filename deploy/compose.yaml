@@ -1,0 +1,37 @@
+name: timemap-test
+x-service: &service
+  image: ${TIMEMAP_IMAGE:?set an immutable tested image digest}
+  user: "10001:10001"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  restart: unless-stopped
+  env_file: [./runtime.env]
+  volumes:
+    - ${TIMEMAP_DATA_DIR:?set isolated data directory}:/data
+  tmpfs: [/tmp:size=32m]
+  logging:
+    driver: json-file
+    options: {max-size: "5m", max-file: "3"}
+services:
+  api:
+    <<: *service
+    ports: ["127.0.0.1:18120:8100"]
+    mem_limit: 384m
+    cpus: 0.5
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.build_opener(urllib.request.ProxyHandler({})).open('http://127.0.0.1:8100/health',timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  worker:
+    <<: *service
+    command: [python, -m, backend.worker]
+    mem_limit: 256m
+    cpus: 0.5
+  sender:
+    <<: *service
+    profiles: [send]
+    command: [python, -m, backend.delivery_worker]
+    mem_limit: 96m
+    cpus: 0.25

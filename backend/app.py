@@ -4,6 +4,8 @@ Factory requires explicit token; mock mode is labelled in every report.
 import hashlib
 import time
 import asyncio
+import threading
+from copy import deepcopy
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, HTTPException, Request as HTTPRequest
@@ -29,21 +31,27 @@ class Request(BaseModel):
     end: int=Field(strict=True,ge=0)
     expected_revision: int=Field(strict=True,ge=0)
     allow_stale: bool=False
+    send_report: bool=False
 
 
-def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager=True,activity_provider=None):
+def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager=True,activity_provider=None,mode="mock",embedded_worker=True,allow_efficiency=True,allow_send=False):
     if not token or len(token)<16: raise ValueError('显式设置至少16字符的本地测试凭据')
+    if mode not in ('mock','production'):raise ValueError('未知运行模式')
+    if mode=='production' and (len(token)<32 or rules is None or activities is not None or eager or embedded_worker):raise ValueError('真实模式配置不完整或包含模拟数据')
     db=Store(path);clock=clock or (lambda:int(time.time()*1000))
     activities=activities if activities is not None else []
     rules=rules if rules is not None else {'version':'mock-v1','categories':{'reading':'effective','coding':'effective','rest':'buffer'}}
     db.initialize_token(token)
     def execute(request):
         validate_range(request.start,request.end)
+        if request.send_report and not allow_send:raise ValueError('sending_disabled')
         rev,state=db.state()
         if rev!=request.expected_revision and not request.allow_stale: raise Conflict('数据版本不同，请同步后重试')
-        extracted = (activity_provider(request.start,request.end,rules) if activity_provider else activities) if request.mode=='efficiency' else []
-        result=analyze(state,extracted,rules,request.start,request.end,clock())
-        result.update({'id':request.request_id,'status':'succeeded','mode':request.mode,'data_revision':rev,'mock':True,'delivery':'not_requested','stale_allowed':request.allow_stale})
+        active_rules=deepcopy(rules)
+        if request.mode=='efficiency' and (not allow_efficiency or (mode=='production' and activity_provider is None)):raise ValueError('efficiency_disabled')
+        extracted = (activity_provider(request.start,request.end,active_rules) if activity_provider else activities) if request.mode=='efficiency' else []
+        result=analyze(state,extracted,active_rules,request.start,request.end,clock())
+        result.update({'id':request.request_id,'status':'succeeded','mode':request.mode,'data_revision':rev,'mock':mode=='mock','delivery':'queued' if request.send_report else 'not_requested','stale_allowed':request.allow_stale})
         if request.mode=='location':
             for day in result['days']:
                 for p in day['locations']:
@@ -57,8 +65,17 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
         if not job:return False
         rid,request,digest,lease=job
         result=None;error=None
-        try:result=execute(Request(**request))
-        except Exception as exc:error=str(exc)
+        stopped=threading.Event()
+        def heartbeat():
+            while not stopped.wait(15):
+                try:db.renew(rid,lease)
+                except Conflict:return
+        pulse=threading.Thread(target=heartbeat,daemon=True);pulse.start()
+        try:
+            if mode=='production' and request['mode']=='efficiency' and not db.quota('model_calls',20,86400):raise ValueError('model_daily_limit')
+            result=execute(Request(**request))
+        except Exception as exc:error=type(exc).__name__ if mode=='production' else str(exc)
+        finally:stopped.set();pulse.join(timeout=2)
         try:db.complete(rid,digest,lease,result=result,error=error)
         except Conflict:pass # another worker reclaimed the expired lease; never overwrite it
         return True
@@ -68,7 +85,7 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
             while True:
                 await asyncio.to_thread(run_next)
                 await asyncio.sleep(.2)
-        task=asyncio.create_task(worker()) if not eager else None
+        task=asyncio.create_task(worker()) if not eager and embedded_worker else None
         try:yield
         finally:
             if task:
@@ -76,19 +93,37 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
                 try:await task
                 except asyncio.CancelledError:pass
     app=FastAPI(title='Time_map mock development API',lifespan=lifespan)
-    app.add_middleware(CORSMiddleware,allow_origins=list(origins),allow_methods=['GET','POST'],allow_headers=['Authorization','Content-Type'])
+    app.add_middleware(CORSMiddleware,allow_origins=list(origins),allow_methods=['GET','POST','PUT'],allow_headers=['Authorization','Content-Type'])
     @app.middleware('http')
     async def bounded_body(request:HTTPRequest,call_next):
         from fastapi.responses import JSONResponse
+        if not db.quota('http:'+str(request.client.host if request.client else 'local'),120):return JSONResponse(status_code=429,headers={'Retry-After':'60'},content={'detail':'rate_limited'})
         body=bytearray()
         async for chunk in request.stream():
             body.extend(chunk)
             if len(body)>2*1024*1024:return JSONResponse(status_code=413,content={'detail':'请求超过2MiB，请分批同步'})
+        if body and request.headers.get('content-type','').startswith('application/json'):
+            try:
+                import json
+                value=json.loads(body)
+                def depth(v,n=0):
+                    if n>24:raise ValueError('json_depth')
+                    if isinstance(v,dict):
+                        for child in v.values():depth(child,n+1)
+                    elif isinstance(v,list):
+                        for child in v:depth(child,n+1)
+                depth(value)
+            except (ValueError,RecursionError):return JSONResponse(status_code=422,content={'detail':'invalid_json'})
         request._body=bytes(body)
         return await call_next(request)
     bearer=HTTPBearer(auto_error=False)
     def auth(credentials: HTTPAuthorizationCredentials | None=Depends(bearer)):
         if credentials is None or not db.authorized(credentials.credentials): raise HTTPException(401,'未授权')
+    from fastapi.exceptions import RequestValidationError
+    @app.exception_handler(RequestValidationError)
+    async def invalid_schema(_,exc):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=422,content={'detail':'invalid_schema'})
     @app.exception_handler(Conflict)
     async def conflict(_,exc):
         from fastapi.responses import JSONResponse
@@ -96,18 +131,24 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
     @app.exception_handler(ValueError)
     async def invalid(_,exc):
         from fastapi.responses import JSONResponse
-        return JSONResponse(status_code=422,content={'detail':str(exc)})
+        return JSONResponse(status_code=422,content={'detail':'invalid_request' if mode=='production' else str(exc)})
     @app.get('/health')
-    def health(): return {'status':'ok','mode':'mock','external_calls':False}
+    def health(): return {'status':'ok','mode':mode,'external_calls':mode=='production' and allow_efficiency}
     @app.post('/v1/sync/batches',dependencies=[Depends(auth)])
     def sync(batch:Batch):
         if (batch.state is None)==(batch.operations is None):raise ValueError('必须且只能提供state或operations')
+        if batch.operations is not None and len(batch.operations)>500:raise ValueError('请分批提交')
         return db.sync(batch.model_dump(exclude_none=True))
     @app.post('/v1/device/rotate',dependencies=[Depends(auth)])
     def rotate(credentials:HTTPAuthorizationCredentials=Depends(bearer)):
         return {'token':db.rotate(credentials.credentials)}
     @app.get('/v1/sync/changes',dependencies=[Depends(auth)])
-    def changes(cursor:int=0,limit:int=50):return db.changes(cursor,limit)
+    def changes(cursor:int=0,limit:int=50,target:int|None=None,after:int=0):return db.changes(cursor,limit,target,after)
+    @app.post('/v1/sync/stage/{sid}/{part}',dependencies=[Depends(auth)])
+    def stage(sid:str,part:int,operations:list[dict]):return db.stage(sid,part,operations)
+    @app.post('/v1/sync/commit/{sid}',dependencies=[Depends(auth)])
+    def commit(sid:str,body:dict):
+        return db.commit_stage(sid,body['parts'],body['base_revision'],body.get('restore_deleted',False))
     @app.get('/v1/segments',dependencies=[Depends(auth)])
     def segments(start:int,end:int):
         rev,state=db.state()
@@ -126,11 +167,15 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
     def report(request:Request):
         validate_range(request.start,request.end)
         if request.mode not in ('location','efficiency'): raise ValueError('未知分析模式')
+        if request.mode=='efficiency' and not allow_efficiency:raise ValueError('efficiency_disabled')
+        if request.send_report and not allow_send:raise ValueError('sending_disabled')
         digest=hashlib.sha256(encode(request.model_dump()).encode()).hexdigest()
         old=db.report(request.request_id)
         if old:
             if old[0]!=digest: raise Conflict('请求ID不能用于不同报告')
             return old[1]
+        existing=db.job(request.request_id)
+        if not existing and not db.quota('analysis',20,86400):raise HTTPException(429,'daily_analysis_limit')
         if not eager:return db.enqueue(request.request_id,digest,request.model_dump())
         return db.save_report(request.request_id,digest,execute(request))
     @app.post('/v1/analysis-jobs/{rid}/retry',dependencies=[Depends(auth)])
@@ -150,6 +195,7 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
         job=db.job(rid)
         if job:return job
         raise HTTPException(404,'报告不存在')
+    app.state.execute=execute
     app.state.run_next=run_next
     app.state.store=db
     return app
