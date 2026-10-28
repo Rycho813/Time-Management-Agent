@@ -45,6 +45,23 @@ class Analysis(unittest.TestCase):
         self.assertEqual(len(r['days'][0]['unknown']),1)
         self.assertEqual(r['days'][1]['unknown'],[])
 
+    def test_unknown_buffer_does_not_hide_confirmed_effective_ratio(self):
+        a=activity();buffer={'id':'buffer','date':'2026-10-28','category':'rest','duration_min':60,'event_name':'生活事务'}
+        rule=rules();rule['categories']['rest']='buffer'
+        buffer['category']='rest'
+        r=analyze(state(),[a,buffer],rule,START,END,END)
+        self.assertEqual(r['locations'][0]['utilization'],1/3)
+        self.assertEqual(len(r['days'][0]['unknown']),1)
+        self.assertEqual(r['days'][0]['gap_ms'],21*3600000)
+    def test_unmapped_timed_effective_only_affects_overlapping_places(self):
+        s=state();s['places'].append({'id':'home','name':'家'})
+        s['segments'].insert(0,{'id':'home','kind':'place','placeId':'home','placeName':'家','start':START,'end':START+3600000})
+        a=activity();unknown={**a,'id':'unknown','start':START,'end':START+1800000,'duration_min':30,'unmatched_place':'子地点'}
+        r=analyze(s,[a,unknown],rules(),START,END,END)
+        locations={p['id']:p for p in r['locations']}
+        self.assertIsNone(locations['home']['utilization'])
+        self.assertEqual(locations['p']['utilization'],1/3)
+
     def test_state_validation(self):
         s=state();s['segments'].append(copy.deepcopy(s['segments'][0]));self.assertRaises(ValueError,validate_state,s)
 

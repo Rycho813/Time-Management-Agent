@@ -67,6 +67,15 @@ def analyze(state,activities,rules,start,end,now):
                 p['stay_ms']+=s['duration']
         date=datetime.fromtimestamp(left/1000,TZ).date().isoformat()
         full=left==int(datetime.fromisoformat(date).replace(tzinfo=TZ).timestamp()*1000) and right-left==DAY
+        def mark_uncertain(activity):
+            # Missing BUFFER/IGNORED attribution does not invalidate effective-time ratios.
+            if rules['categories'].get(activity.get('category'),'ignored') != 'effective':return
+            ids=set()
+            if activity.get('place_id') in locations:ids.add(activity['place_id'])
+            if activity.get('start') is not None and activity.get('end') is not None:
+                ids.update(s['placeId'] for s in pieces if s['kind']=='place' and s['displayStart']<activity['end'] and s['displayEnd']>activity['start'])
+            elif not ids:ids.update(locations)
+            for pid in ids:locations[pid]['uncertain']=True
         seen=set()
         for a in activities:
             if a.get('date') != date and not (a.get('start') is not None and a.get('end') is not None): continue
@@ -77,7 +86,7 @@ def analyze(state,activities,rules,start,end,now):
             if not isinstance(aid,str) or not aid: raise ValueError('活动必须有来源ID')
             if aid in seen:
                 warnings.append(f'重复活动:{aid}');
-                for p in locations.values(): p['uncertain']=True
+                mark_uncertain(a)
                 continue
             seen.add(aid)
             minutes=a.get('duration_min')
@@ -88,7 +97,7 @@ def analyze(state,activities,rules,start,end,now):
             warnings.extend(f'活动{aid}：{warning}' for warning in a.get('time_warnings',[]))
             if a.get('temporal_issue') or a.get('unmatched_place'):
                 unknown.append({**event,'reason':a.get('temporal_issue') or '明确地点尚未确认别名，不能按时间改配到其他地点'})
-                for p in locations.values():p['uncertain']=True
+                mark_uncertain(a)
                 continue
             timed=a.get('start') is not None and a.get('end') is not None
             if timed:
@@ -98,12 +107,12 @@ def analyze(state,activities,rules,start,end,now):
                 if x>=y: continue
                 if abs((aend-astart)-minutes*60000)>1000:
                     unknown.append({**event,'reason':'跨度与活动时长不一致，不能精确分摊'})
-                    for p in locations.values(): p['uncertain']=True
+                    mark_uncertain(a)
                     continue
                 matches=[(s,max(x,s['displayStart']),min(y,s['displayEnd'])) for s in pieces if s['kind']=='place' and s['displayStart']<y and s['displayEnd']>x]
                 if a.get('place_id') and any(s['placeId']!=a['place_id'] for s,_,_ in matches):
                     unknown.append({**event,'reason':'活动地点与时间日志冲突'})
-                    for p in locations.values(): p['uncertain']=True
+                    mark_uncertain(a)
                     continue
                 covered=sum(r-l for _,l,r in matches)
                 if covered<y-x: unknown.append({**event,'reason':'活动部分时间没有地点记录','duration_ms':y-x-covered})
@@ -117,7 +126,7 @@ def analyze(state,activities,rules,start,end,now):
                     allocated.setdefault(p['id'],[]).append(None)
             else:
                 unknown.append({**event,'reason':'缺少地点或部分日缺少精确起止时间'})
-                for p in locations.values(): p['uncertain']=True
+                mark_uncertain(a)
         for pid,l,r,event in events:
             p=locations[pid];p['activities'].append({**event,'matched_start':l,'matched_end':r})
             if event['time_type']=='effective':
@@ -133,7 +142,10 @@ def analyze(state,activities,rules,start,end,now):
                 warnings.append(f'含仅时长活动，无法校验时间重叠:{p["name"]}')
             p['utilization']=None if p['uncertain'] or not p['stay_ms'] else p['effective_ms']/p['stay_ms']
             p['unconfirmed_ms']=None if p['uncertain'] else p['stay_ms']-p['effective_ms']
-        return {'date':date,'locations':list(locations.values()),'unknown':unknown,'warnings':warnings,'transit_ms':sum(s['duration'] for s in pieces if s['kind']=='transit')}
+        recorded=sum(s['duration'] for s in pieces)
+        gap=max(0,min(right,now)-left-recorded)
+        if gap:warnings.append(f'地点日志存在{gap/60000:.2f}分钟空白，未自动补齐')
+        return {'recorded_ms':recorded,'gap_ms':gap,'date':date,'locations':list(locations.values()),'unknown':unknown,'warnings':warnings,'transit_ms':sum(s['duration'] for s in pieces if s['kind']=='transit')}
     days=[one(l,r) for _,l,r in day_ranges(start,end)]
     totals={}
     for day in days:
