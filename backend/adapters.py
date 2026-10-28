@@ -21,8 +21,8 @@ def response_json(response):
     return response.json()
 
 class NotionSource:
-    def __init__(self,pages_by_year,token,transport,version='2022-06-28'):
-        self.pages=pages_by_year;self.token=token;self.http=transport;self.version=version
+    def __init__(self,pages_by_year,token,transport,version='2022-06-28',include_previous=True):
+        self.pages=pages_by_year;self.token=token;self.http=transport;self.version=version;self.include_previous=include_previous
     def children(self,block):
         cursor=None;seen=set();out=[]
         while True:
@@ -40,7 +40,8 @@ class NotionSource:
     def __call__(self,start,end):
         # Include previous date for explicit overnight activities, not as another full-day total.
         dates={day for day,_,_ in day_ranges(start,end)}
-        first=min(dates);dates.add((date.fromisoformat(first)-timedelta(days=1)).isoformat())
+        first=min(dates)
+        if self.include_previous:dates.add((date.fromisoformat(first)-timedelta(days=1)).isoformat())
         pages={self.pages[int(day[:4])] for day in dates if int(day[:4]) in self.pages}
         if any(int(day[:4]) not in self.pages for day in dates):raise ValueError('缺少源日程年份映射（包括跨午夜前一天）')
         found={};records=[]
@@ -118,7 +119,7 @@ time_type只允许effective、buffer、ignored；project_status只允许open、c
 class FeishuSender:
     def __init__(self,webhook,transport):
         parsed=urlparse(webhook)
-        if parsed.scheme!='https' or parsed.hostname!='open.feishu.cn' or not parsed.path.startswith('/open-apis/bot/v2/hook/'):raise ValueError('无效飞书机器人地址')
+        if parsed.scheme!='https' or parsed.hostname!='open.feishu.cn' or parsed.username or parsed.password or parsed.port not in (None,443) or parsed.query or parsed.fragment or not __import__('re').fullmatch(r'/open-apis/bot/v2/hook/[A-Za-z0-9_-]+',parsed.path):raise ValueError('无效飞书机器人地址')
         self.webhook=webhook;self.http=transport
     def __call__(self,text,key):
         try:r=self.http.request('POST',self.webhook,json={'msg_type':'text','content':{'text':text}})
@@ -152,3 +153,13 @@ class ActivityProvider:
     """Connect original-source and extractor to create_app(activity_provider=...)."""
     def __init__(self,source,extractor):self.source=source;self.extractor=extractor
     def __call__(self,start,end,rules):return self.extractor(self.source(start,end),rules)
+
+
+def feishu_sender_from_env(transport,environ=None):
+    import os
+    env=os.environ if environ is None else environ
+    value=env.get('FEISHU_WEBHOOK_DIRECT_URL') or env.get('FEISHU_WEBHOOK_URL','')
+    if not value:raise ValueError('缺少飞书webhook配置')
+    try:return FeishuSender(value,transport)
+    except ValueError:
+        raise ValueError('webhook不是可直接调用的完整HTTPS地址；请在环境变量设置添加FEISHU_WEBHOOK_DIRECT_URL，直接注入原机器人地址，不要放入代理密钥字段。') from None
