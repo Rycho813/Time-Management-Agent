@@ -82,6 +82,11 @@ def analyze(state,activities,rules,start,end,now):
             classification=rules['categories'].get(a.get('category'),'ignored')
             if classification not in ('effective','buffer','ignored'): raise ValueError('分类规则无效')
             event={**a,'time_type':classification,'rule_version':rules['version']}
+            warnings.extend(f'活动{aid}：{warning}' for warning in a.get('time_warnings',[]))
+            if a.get('temporal_issue') or a.get('unmatched_place'):
+                unknown.append({**event,'reason':a.get('temporal_issue') or '明确地点尚未确认别名，不能按时间改配到其他地点'})
+                for p in locations.values():p['uncertain']=True
+                continue
             timed=a.get('start') is not None and a.get('end') is not None
             if timed:
                 astart,aend=a['start'],a['end']

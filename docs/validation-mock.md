@@ -10,3 +10,8 @@
 - pip check、git diff --check通过。运行说明见mock-development.md。
 
 尚未验证：真实API、Safari实机、服务器资源峰值、大规模首次导入、生产认证/心跳/限流、常驻调度和COS。生产适配未接入原Actions，无上线声明。
+
+
+## 开始时间＋持续时长接口适配回归
+
+后端37项通过，其中新增16项模拟协议/时间测试；前端18项保持通过。规格同步支持三类时间及自然语言。真实Notion/Gemini/Ollama/飞书均未调用，详见Agent仓库docs/interface-adaptation.md。未部署、未合并、未改生产日历或Actions。

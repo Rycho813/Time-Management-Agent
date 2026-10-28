@@ -31,7 +31,7 @@ class Request(BaseModel):
     allow_stale: bool=False
 
 
-def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager=True):
+def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager=True,activity_provider=None):
     if not token or len(token)<16: raise ValueError('显式设置至少16字符的本地测试凭据')
     db=Store(path);clock=clock or (lambda:int(time.time()*1000))
     activities=activities if activities is not None else []
@@ -41,7 +41,8 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
         validate_range(request.start,request.end)
         rev,state=db.state()
         if rev!=request.expected_revision and not request.allow_stale: raise Conflict('数据版本不同，请同步后重试')
-        result=analyze(state,activities if request.mode=='efficiency' else [],rules,request.start,request.end,clock())
+        extracted = (activity_provider(request.start,request.end,rules) if activity_provider else activities) if request.mode=='efficiency' else []
+        result=analyze(state,extracted,rules,request.start,request.end,clock())
         result.update({'id':request.request_id,'status':'succeeded','mode':request.mode,'data_revision':rev,'mock':True,'delivery':'not_requested','stale_allowed':request.allow_stale})
         if request.mode=='location':
             for day in result['days']:
