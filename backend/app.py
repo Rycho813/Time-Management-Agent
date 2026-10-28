@@ -2,10 +2,11 @@
 Factory requires explicit token; mock mode is labelled in every report.
 """
 import hashlib
-import hmac
 import time
+import asyncio
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request as HTTPRequest
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
@@ -16,7 +17,9 @@ class Batch(BaseModel):
     model_config=ConfigDict(extra='forbid')
     batch_id: str=Field(min_length=1,max_length=128)
     base_revision: int=Field(strict=True,ge=0)
-    state: dict
+    state: dict | None=None
+    operations: list[dict] | None=None
+    restore_deleted: bool=False
 
 class Request(BaseModel):
     model_config=ConfigDict(extra='forbid')
@@ -28,16 +31,63 @@ class Request(BaseModel):
     allow_stale: bool=False
 
 
-def create_app(path,token,activities=None,rules=None,origins=(),clock=None):
+def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager=True):
     if not token or len(token)<16: raise ValueError('显式设置至少16字符的本地测试凭据')
     db=Store(path);clock=clock or (lambda:int(time.time()*1000))
     activities=activities if activities is not None else []
     rules=rules if rules is not None else {'version':'mock-v1','categories':{'reading':'effective','coding':'effective','rest':'buffer'}}
-    app=FastAPI(title='Time_map mock development API')
+    db.initialize_token(token)
+    def execute(request):
+        validate_range(request.start,request.end)
+        rev,state=db.state()
+        if rev!=request.expected_revision and not request.allow_stale: raise Conflict('数据版本不同，请同步后重试')
+        result=analyze(state,activities if request.mode=='efficiency' else [],rules,request.start,request.end,clock())
+        result.update({'id':request.request_id,'status':'succeeded','mode':request.mode,'data_revision':rev,'mock':True,'delivery':'not_requested','stale_allowed':request.allow_stale})
+        if request.mode=='location':
+            for day in result['days']:
+                for p in day['locations']:
+                    for k in ('effective_ms','utilization','unconfirmed_ms','uncertain','activities'):p.pop(k,None)
+            for p in result['locations']:
+                for k in ('effective_ms','utilization','uncertain'):p.pop(k,None)
+            result.pop('rule_version',None)
+        return result
+    def run_next():
+        job=db.claim()
+        if not job:return False
+        rid,request,digest,lease=job
+        result=None;error=None
+        try:result=execute(Request(**request))
+        except Exception as exc:error=str(exc)
+        try:db.complete(rid,digest,lease,result=result,error=error)
+        except Conflict:pass # another worker reclaimed the expired lease; never overwrite it
+        return True
+    @asynccontextmanager
+    async def lifespan(app):
+        async def worker():
+            while True:
+                await asyncio.to_thread(run_next)
+                await asyncio.sleep(.2)
+        task=asyncio.create_task(worker()) if not eager else None
+        try:yield
+        finally:
+            if task:
+                task.cancel()
+                try:await task
+                except asyncio.CancelledError:pass
+    app=FastAPI(title='Time_map mock development API',lifespan=lifespan)
     app.add_middleware(CORSMiddleware,allow_origins=list(origins),allow_methods=['GET','POST'],allow_headers=['Authorization','Content-Type'])
+    @app.middleware('http')
+    async def bounded_body(request:HTTPRequest,call_next):
+        from fastapi.responses import JSONResponse
+        body=bytearray()
+        async for chunk in request.stream():
+            body.extend(chunk)
+            if len(body)>2*1024*1024:return JSONResponse(status_code=413,content={'detail':'请求超过2MiB，请分批同步'})
+        request._body=bytes(body)
+        return await call_next(request)
     bearer=HTTPBearer(auto_error=False)
     def auth(credentials: HTTPAuthorizationCredentials | None=Depends(bearer)):
-        if credentials is None or not hmac.compare_digest(credentials.credentials,token): raise HTTPException(401,'未授权')
+        if credentials is None or not db.authorized(credentials.credentials): raise HTTPException(401,'未授权')
     @app.exception_handler(Conflict)
     async def conflict(_,exc):
         from fastapi.responses import JSONResponse
@@ -49,13 +99,14 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None):
     @app.get('/health')
     def health(): return {'status':'ok','mode':'mock','external_calls':False}
     @app.post('/v1/sync/batches',dependencies=[Depends(auth)])
-    def sync(batch:Batch): return db.sync(batch.model_dump())
+    def sync(batch:Batch):
+        if (batch.state is None)==(batch.operations is None):raise ValueError('必须且只能提供state或operations')
+        return db.sync(batch.model_dump(exclude_none=True))
+    @app.post('/v1/device/rotate',dependencies=[Depends(auth)])
+    def rotate(credentials:HTTPAuthorizationCredentials=Depends(bearer)):
+        return {'token':db.rotate(credentials.credentials)}
     @app.get('/v1/sync/changes',dependencies=[Depends(auth)])
-    def changes(cursor:int=0):
-        if cursor<0: raise ValueError('游标无效')
-        rev,state=db.state()
-        if cursor>rev: raise Conflict('游标超出当前版本')
-        return {'revision':rev,'state':state if cursor<rev else None}
+    def changes(cursor:int=0,limit:int=50):return db.changes(cursor,limit)
     @app.get('/v1/segments',dependencies=[Depends(auth)])
     def segments(start:int,end:int):
         rev,state=db.state()
@@ -79,22 +130,25 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None):
         if old:
             if old[0]!=digest: raise Conflict('请求ID不能用于不同报告')
             return old[1]
-        rev,state=db.state()
-        if rev!=request.expected_revision and not request.allow_stale: raise Conflict('数据版本不同，请同步后重试')
-        result=analyze(state,activities if request.mode=='efficiency' else [],rules,request.start,request.end,clock())
-        result.update({'id':request.request_id,'status':'succeeded','mode':request.mode,'data_revision':rev,'mock':True,'delivery':'not_requested','stale_allowed':request.allow_stale})
-        if request.mode=='location':
-            for day in result['days']:
-                for p in day['locations']:
-                    for k in ('effective_ms','utilization','unconfirmed_ms','uncertain','activities'):p.pop(k,None)
-            for p in result['locations']:
-                for k in ('effective_ms','utilization','uncertain'):p.pop(k,None)
-            result.pop('rule_version',None)
-        return db.save_report(request.request_id,digest,result)
+        if not eager:return db.enqueue(request.request_id,digest,request.model_dump())
+        return db.save_report(request.request_id,digest,execute(request))
+    @app.post('/v1/analysis-jobs/{rid}/retry',dependencies=[Depends(auth)])
+    def retry(rid:str):
+        with db.connect() as conn:
+            row=conn.execute('SELECT status,attempts FROM jobs WHERE id=?',(rid,)).fetchone()
+            if not row:raise HTTPException(404,'任务不存在')
+            if row[0]!='failed' or row[1]>=3:raise Conflict('只允许失败任务重试，最多3次尝试')
+            conn.execute("UPDATE jobs SET status='queued',error=NULL WHERE id=?",(rid,))
+        return db.job(rid)
+    @app.get('/v1/reports',dependencies=[Depends(auth)])
+    def history(offset:int=0,limit:int=20):return {'items':db.history(offset,limit)}
     @app.get('/v1/analysis-jobs/{rid}',dependencies=[Depends(auth)])
     def get_report(rid:str):
         old=db.report(rid)
-        if not old: raise HTTPException(404,'报告不存在')
-        return old[1]
+        if old:return old[1]
+        job=db.job(rid)
+        if job:return job
+        raise HTTPException(404,'报告不存在')
+    app.state.run_next=run_next
     app.state.store=db
     return app
