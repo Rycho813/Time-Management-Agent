@@ -115,3 +115,6 @@
 ## V1.2 开发分支
 
 当前仅为本地模拟开发版本，不应部署到生产。完整需求见 [规格](docs/time_map_spec.md)，已验证范围与未完成项见 [模拟开发说明](docs/mock-development.md)。
+# GitHub 固定提交测试部署
+
+当前测试部署材料见 [源码部署审核说明](docs/github-source-deployment.md)。先拉取两个已审核提交，服务器本机构建并记录镜像 ID，再独立配置和内部验收；执行服务器操作仍须用户批准。不需要 Release 附件，不自动改 DNS/Caddy 或触发原日报。

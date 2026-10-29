@@ -1,5 +1,7 @@
 # Time_map V1.2 腾讯云测试部署前加固与部署方案
 
+> 本文保留前期方案和审查历史。当前选择“服务器从 GitHub 拉取固定提交并本机构建”，最新操作以 [源码部署审核说明](github-source-deployment.md) 为准；不再要求离线 Release 中转。we-mp-rss 已由用户删除，不属于当前备份/恢复范围。
+
 状态：待用户审核；本轮仅本地代码审查与方案编写。未连接腾讯云、未修改服务器/DNS/Caddy、未发送消息、未合并、未部署。
 
 审查基线：Time-Management-Agent feature/v1.2 的 dfd4844，以及当前 Time_map feature/v1.2。正式实施前记录两个仓库精确提交并复核工作区。
