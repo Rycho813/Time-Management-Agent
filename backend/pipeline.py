@@ -12,7 +12,7 @@ def render_location(result):
     lines=['【地点效率】']
     if result.get('location_unavailable'):return '\n'.join(lines+result['warnings'])
     for day in result['days']:
-        lines.append(day['date'])
+        if len(result['days']) > 1:lines.append(day['date'])
         for p in day['locations']:
             ratio='无法准确确定' if p['utilization'] is None else f'{p["utilization"]:.1%}'
             lines.append(f'{p["name"]}：停留{p["stay_ms"]/60000:g}分钟，有效{p["effective_ms"]/60000:g}分钟，利用率{ratio}')
@@ -60,7 +60,8 @@ class Pipeline:
         return activities,result
     def manual(self,start,end,now):
         _,result=self.analyze(start,end,now)
-        text=f'【独立区间分析｜{start}—{end}】\n'+render_location(result)
+        from .report_delivery import render_day
+        text='\n\n'.join(render_day(result,day) for day in result['days'])
         return result,send_parts(text,self.sender)
     def prepare_daily(self,date,start,end,now,sleep_minutes=420):
         from .daily import day_bounds, daily_activities

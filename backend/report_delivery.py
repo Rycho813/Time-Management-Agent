@@ -7,18 +7,20 @@ import os
 from pathlib import Path
 from datetime import datetime
 from .core import TZ,clip
+from time_summary import report_title
 
 def duration(ms):
     seconds=int(ms/1000);hours,seconds=divmod(seconds,3600);minutes,seconds=divmod(seconds,60)
     return f'{hours:02}:{minutes:02}:{seconds:02}'
-def stamp(ms):return datetime.fromtimestamp(ms/1000,TZ).strftime('%m-%d %H:%M:%S')
+def stamp(ms):return datetime.fromtimestamp(ms/1000,TZ).strftime('%H:%M')
 
 def render_day(result,day):
-    lines=[f'【Time_map V1.2 独立测试报告｜{day["date"]}】','北京时间；真实数据联调，非正式日报。','', '地点与路程时间流：']
+    lines=[report_title(day['date']), '', '地点与路程：']
     midnight=int(datetime.fromisoformat(day['date']).replace(tzinfo=TZ).timestamp()*1000)
     left=max(midnight,result['start']);right=min(midnight+86400000,result['end'])
     for s in clip(result['timeline'],left,right,result['as_of']):
-        lines.append(f'{stamp(s["displayStart"])}—{stamp(s["displayEnd"])}｜{s.get("placeName","路程")}｜{duration(s["duration"])}')
+        end_clock = '24:00' if s['displayEnd'] == midnight+86400000 else stamp(s['displayEnd'])
+        lines.append(f'{stamp(s["displayStart"])}—{end_clock}｜{s.get("placeName","路程")}｜{duration(s["duration"])}')
     lines+=['','地点统计与活动：']
     for p in day['locations']:
         ratio='无法准确确定' if p['utilization'] is None else f'{p["utilization"]:.2%}'
@@ -27,10 +29,11 @@ def render_day(result,day):
             matched=(a['matched_end']-a['matched_start']) if 'matched_start' in a else a['duration_min']*60000
             label={'effective':'有效','buffer':'缓冲','ignored':'未计入'}[a['time_type']]
             lines.append(f'  {a["event_name"]}｜{label}｜归属{duration(matched)}')
-    lines+=['',f'路程合计：{duration(day["transit_ms"])}',f'日志空白：{duration(day.get("gap_ms",0))}（未自动补齐）','', '未知归属与异常：']
+    lines+=['',f'路程合计：{duration(day["transit_ms"])}']
+    if day.get('gap_ms',0):lines.append(f'日志空白：{duration(day["gap_ms"])}（未补齐）')
+    if day['unknown'] or day['warnings']:lines+=['', '待确认：']
     for a in day['unknown']:lines.append(f'{a["event_name"]}：{a["reason"]}'+(f'，{duration(a["duration_ms"])}' if a.get('duration_ms') else ''))
     lines+=day['warnings']
-    lines+=['','占比仅依据当前规则和已记录、可归属活动；未确认为有效不等于浪费。',f'规则版本：{result["rule_version"]}；本报告不更新项目累计、Notion日报或Life Calendar。']
     return '\n'.join(lines)
 
 def split_text(text,max_bytes=10000):
@@ -58,7 +61,7 @@ def prepare(result,directory):
         (directory/(day['date']+'.md')).write_text(text)
         parts=split_text(text)
         for index,part in enumerate(parts):
-            body=f'【{day["date"]}｜{index+1}/{len(parts)}】\n'+part
+            body=part if len(parts)==1 else part+f'\n（第{index+1}/{len(parts)}段）'
             entries.append({'date':day['date'],'part':index+1,'key':hashlib.sha256(body.encode()).hexdigest(),'text':body,'status':'prepared'})
     write_private(manifest,{'entries':entries})
     return manifest

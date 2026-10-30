@@ -28,9 +28,9 @@ class BeijingCompatibility(unittest.TestCase):
             result = analyze(data, [], rules(), start, end, end)
             self.assertEqual([d['locations'][0]['stay_ms'] for d in result['days']], [1800000,1800000])
             text = render_day(result, result['days'][1])
-            self.assertIn('00:00:00', text)
-            self.assertIn('00:30:00', text)
-            self.assertNotIn('23:30:00', text)
+            self.assertIn('00:00—00:30', text)
+            self.assertNotIn('00:00:00—', text)
+            self.assertNotIn('23:30—', text)
             # A range ending exactly at midnight has no next-day report.
             self.assertEqual(len(list(day_ranges(start, start+1800000))), 1)
 

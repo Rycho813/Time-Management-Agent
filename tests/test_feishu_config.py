@@ -31,9 +31,9 @@ class FeishuConfig(unittest.TestCase):
         data=state();data['segments'][0].update(start=END-3600000,end=END+3600000)
         r=analyze(data,[],rules(),START,END+86400000,END+86400000)
         first=render_day(r,r['days'][0]);second=render_day(r,r['days'][1])
-        self.assertIn('10-28 23:00:00—10-29 00:00:00',first)
-        self.assertNotIn('10-29 01:00:00',first)
-        self.assertIn('10-29 00:00:00—10-29 01:00:00',second)
+        self.assertIn('23:00—24:00',first)
+        self.assertNotIn('00:00—01:00',first)
+        self.assertIn('00:00—01:00',second)
 
     def test_business_error_and_splitting(self):
         r=analyze(state(),[activity()],rules(),START,END,END)

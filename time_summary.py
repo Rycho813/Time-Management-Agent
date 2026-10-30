@@ -130,6 +130,13 @@ def get_weekday_cn(target_date: str) -> str:
     weekday_map = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
     return weekday_map[date.fromisoformat(target_date).weekday()]
 
+def report_title(target_date: str) -> str:
+    day = date.fromisoformat(target_date)
+    return f"{day.year}年{day.month}月{day.day}日时间报告"
+
+
 def build_feishu_report(target_date: str, snapshot: str, summary: str) -> str:
-    weekday = get_weekday_cn(target_date)
-    return f"【时间管理日报｜{target_date} {weekday}】\n\n{summary}\n\n{snapshot}"
+    # The snapshot heading duplicates the report date; retain the snapshot body.
+    heading = f"【Activity Snapshot｜{target_date}】\n"
+    body = snapshot.removeprefix(heading)
+    return f"{report_title(target_date)}\n\n{summary}\n\n{body}"
