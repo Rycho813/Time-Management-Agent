@@ -44,9 +44,9 @@ def send_parts(text,sender,max_bytes=12000):
 
 
 class Pipeline:
-    def __init__(self,source,extractor,location_source,rules,sender,legacy_sink=None):
+    def __init__(self,source,extractor,location_source,rules,sender,legacy_sink=None,legacy_complete=None):
         self.source=source;self.extractor=extractor;self.location_source=location_source
-        self.rules=rules;self.sender=sender;self.legacy_sink=legacy_sink
+        self.rules=rules;self.sender=sender;self.legacy_sink=legacy_sink;self.legacy_complete=legacy_complete
     def analyze(self,start,end,now,allow_location_failure=False):
         raw=deepcopy(self.source(start,end)) # source must read authoritative original schedule
         rules=deepcopy(self.rules)
@@ -62,11 +62,21 @@ class Pipeline:
         _,result=self.analyze(start,end,now)
         text=f'【独立区间分析｜{start}—{end}】\n'+render_location(result)
         return result,send_parts(text,self.sender)
-    def daily(self,date,start,end,now,sleep_minutes=420):
+    def prepare_daily(self,date,start,end,now,sleep_minutes=420):
+        from .daily import day_bounds, daily_activities
+        if (start,end) != day_bounds(date):raise ValueError("日报必须为北京时间完整自然日")
         activities,result=self.analyze(start,end,now,allow_location_failure=True)
         # Same classification object drives old summary and new location chapter.
-        items=normalize_items(activities)
+        projected,warnings=daily_activities(activities,date)
+        result["warnings"].extend(warnings)
+        items=normalize_items(projected)
         snapshot=build_activity_snapshot(date,items);summary=build_summary(date,items,sleep_minutes)
-        if self.legacy_sink:self.legacy_sink(date,items,snapshot,summary)
+        if self.legacy_complete:
+            snapshot,summary=self.legacy_complete(date,items,sleep_minutes,warnings=warnings)
+        elif self.legacy_sink:self.legacy_sink(date,items,snapshot,summary)
         text=build_feishu_report(date,snapshot,summary)+'\n\n'+render_location(result)
+        if warnings and not self.legacy_complete:text+='\n'+'\n'.join(warnings)
+        return result,text
+    def daily(self,date,start,end,now,sleep_minutes=420):
+        result,text=self.prepare_daily(date,start,end,now,sleep_minutes)
         return result,send_parts(text,self.sender)

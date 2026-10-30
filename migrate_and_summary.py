@@ -67,6 +67,8 @@ def resolve_target_dates(args) -> list[str]:
     return [get_relative_date_str(args.default_date_offset)]
 
 def get_current_local_date() -> date:
+    if os.getenv('TIMEMAP_DAILY_V12') == '1':
+        return datetime.now(ZoneInfo('Asia/Shanghai')).date()
     try:
         return datetime.now(ZoneInfo(APP_TIMEZONE)).date()
     except ZoneInfoNotFoundError:
@@ -109,6 +111,11 @@ def generate_snapshot_and_summary(
     )
     items = normalize_items(extraction_result.get("items", []))
 
+    return complete_daily_items(target_date, page_id, items, sleep_minutes, weekly_summary_weekday)
+
+
+def complete_daily_items(target_date, page_id, items, sleep_minutes, weekly_summary_weekday, warnings=()):
+    """Shared legacy chapters and writebacks; caller supplies one classified item list."""
     completion_report = update_projects_for_day(
         target_date,
         items,
@@ -135,6 +142,9 @@ def generate_snapshot_and_summary(
 
     if completion_report:
         summary = f"{summary}\n\n{completion_report}"
+
+    if warnings:
+        summary += "\n\n【日报归属提示】\n"+"\n".join(warnings)
 
     print(f"\n准备写入 {target_date} 的 Activity Snapshot 和 summary...\n")
     update_page_rich_text_properties(
@@ -172,6 +182,10 @@ def run_daily_workflow(
     print(f"睡觉时间：{sleep_hours}h")
     print(f"周总结触发日：{format_weekday_cn(weekly_summary_weekday)}")
 
+    if os.getenv('TIMEMAP_DAILY_V12') == '1' and not dry_run:
+        from backend.daily_bridge import configuration
+        configuration(os.environ,target_date)  # Validate before the first legacy write.
+
     page_id, source_block_id = migrate_single_day(
         target_date=target_date,
         overwrite_body=overwrite_body,
@@ -188,15 +202,23 @@ def run_daily_workflow(
         print(f"\n[DRY RUN] 跳过 AI 总结、Notion 写入和飞书发送：{target_date}")
         return
 
-    snapshot, summary = generate_snapshot_and_summary(
-        target_date=target_date,
-        page_id=page_id,
-        source_block_id=source_block_id,
-        sleep_minutes=sleep_minutes,
-        weekly_summary_weekday=weekly_summary_weekday,
-    )
+    if os.getenv('TIMEMAP_DAILY_V12') == '1':
+        from backend.daily_bridge import prepare_legacy_daily
+        _, report = prepare_legacy_daily(
+            target_date, sleep_minutes,
+            lambda day,items,sleep,**kw: complete_daily_items(day,page_id,items,sleep,weekly_summary_weekday,**kw),
+            project_names=get_existing_project_names,
+        )
+    else:
+        snapshot, summary = generate_snapshot_and_summary(
+            target_date=target_date,
+            page_id=page_id,
+            source_block_id=source_block_id,
+            sleep_minutes=sleep_minutes,
+            weekly_summary_weekday=weekly_summary_weekday,
+        )
 
-    report = build_feishu_report(target_date, snapshot, summary)
+        report = build_feishu_report(target_date, snapshot, summary)
 
     if send_feishu:
         print(f"\n准备发送 {target_date} 的报告到飞书...\n")
