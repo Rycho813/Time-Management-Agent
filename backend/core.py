@@ -126,7 +126,7 @@ def analyze(state,activities,rules,start,end,now,place_aliases=None):
                     events.append((s['placeId'],l,r,event))
             elif full and a.get('place_id') in locations:
                 p=locations[a['place_id']]
-                p['activities'].append({**event,'attribution':'reported_place_duration'})
+                p['activities'].append({**event,'attribution':'user_wake_home_duration' if event.get('place_match_basis')=='user_wake_home' else 'reported_place_duration'})
                 p['recorded_activity_ms']+=round(minutes*60000)
                 if classification=='effective':
                     p['effective_ms']+=round(minutes*60000)

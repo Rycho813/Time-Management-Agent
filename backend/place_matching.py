@@ -5,7 +5,7 @@ import re
 import unicodedata
 from zoneinfo import ZoneInfo
 
-VERSION = 'place-duration-v1'
+VERSION = 'place-duration-v2'
 TZ = ZoneInfo('Asia/Shanghai')
 
 
@@ -54,10 +54,21 @@ def evidence(activity, names):
             return visit[1], 'source_place_group'
     if activity.get('place_text'):
         return activity['place_text'], 'extracted_place'
-    for heading in reversed(activity.get('source_ancestors', [])):
+    ancestors = activity.get('source_ancestors', [])
+    for heading in reversed(ancestors):
+        explicit = re.fullmatch(r'(?:在|位于)(.+)', heading.strip())
+        if explicit:
+            return explicit[1], 'parent_place'
         parts = phrase_parts(heading, names)
         if normalize(heading) in names or any(part in names for part in parts):
             return heading, 'parent_place'
+    if activity.get('place_id') and not activity.get('unmatched_place'):
+        return '', ''  # Preserve existing explicit-ID inputs.
+    wake_heading = any(re.fullmatch(r'起床(?:时间|后(?:活动|日常)?|活动|日常|流程)?',normalize(heading)) for heading in ancestors)
+    wake_activity = re.match(r'^起床(?:后|洗漱|吃饭|早餐|整理|活动|日常|流程|[、/，,和与\s]|$)',activity.get('event_name',''))
+    if wake_heading or wake_activity:
+        # User-authorized default, distinct from a place explicitly present in the source.
+        return '家', 'user_wake_home'
     return '', ''
 
 
@@ -91,7 +102,7 @@ def resolve_places(state, activities, aliases=None):
         text = activity.get('source_text','')
         denied = re.search(r'(?:不在|没在|未在|不去|没去|未去)\s*'+re.escape(phrase),text)
         planned = re.search(r'(?:准备|计划|打算|拟|想)(?:前往|去|到)\s*'+re.escape(phrase),text)
-        if basis in ('extracted_place','parent_place') and (denied or planned):
+        if basis in ('extracted_place','parent_place','user_wake_home') and (denied or planned):
             activity.pop('place_id',None)
             activity.update(unmatched_place=phrase,place_match_status='unmatched',place_match_version=VERSION,
                             place_match_reason='原文否定该地点或仅计划前往，不能作为活动发生地')

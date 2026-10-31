@@ -59,8 +59,10 @@ class DurationPlaces(unittest.TestCase):
         group=[a for a in result['days'][0]['unknown'] if a.get('place_match_status')=='group']
         self.assertEqual(len(group),1);self.assertEqual(group[0]['duration_min'],140)
         self.assertEqual(group[0]['place_ids'],['shop0','shop1','shop2','shop3'])
-        missing=[a for a in result['days'][0]['unknown'] if a['source_id']=='morning']
-        self.assertEqual(len(missing),1);self.assertNotIn('place_id',missing[0])
+        self.assertFalse(any(a['source_id']=='morning' for a in result['days'][0]['unknown']))
+        wake=[a for a in locations['home']['activities'] if a['source_id']=='morning'][0]
+        self.assertEqual(wake['attribution'],'user_wake_home_duration')
+        self.assertEqual(locations['home']['recorded_activity_ms'],116*60000)
         self.assertEqual(activities,before)
         self.assertEqual(sum(a['duration_min'] for a in daily_activities(activities,'2026-10-28')[0]),421)
 
@@ -210,6 +212,49 @@ class DurationPlaces(unittest.TestCase):
             self.assertEqual(projected[0]['duration_min'],25)
             result=analyze(sample_state(),activities,RULES,START,END,END)
             self.assertEqual(result['locations'][0]['effective_ms'],25*60000)
+
+    def test_wake_rule_handles_activity_without_requiring_home_in_source(self):
+        records=[{'id':'wake','date':'2026-10-28','text':'起床洗漱30min'}]
+        activities=ActivityExtractor(lambda *_:{'items':[entry('wake','起床洗漱','30min',kind='buffer')]})(records,RULES)
+        resolved=resolve_places(sample_state(),activities)[0]
+        self.assertEqual(resolved['place_id'],'home')
+        self.assertEqual(resolved['place_match_basis'],'user_wake_home')
+        self.assertIsNone(resolved['start']);self.assertIsNone(resolved['end'])
+        bad={**entry('wake','起床洗漱','30min',kind='buffer'),'place_text':'家'}
+        with self.assertRaises(ValueError):ActivityExtractor(lambda *_:{'items':[bad]})(records,RULES)
+
+    def test_wake_rule_explicit_other_place_and_negation_take_priority(self):
+        wake=self.extracted()[0]
+        wake.update(source_text='在示例图书馆，吃饭休息50分钟',place_text='')
+        self.assertEqual(resolve_places(sample_state(),[wake])[0]['place_id'],'library')
+        wake.update(source_text='吃饭休息50分钟',source_ancestors=['示例图书馆','起床时间'])
+        self.assertEqual(resolve_places(sample_state(),[wake])[0]['place_id'],'library')
+        wake['source_ancestors']=['在未登记旅馆','起床时间']
+        resolved=resolve_places(sample_state(),[wake])[0]
+        self.assertNotIn('place_id',resolved);self.assertEqual(resolved['unmatched_place'],'未登记旅馆')
+        wake.update(source_ancestors=['起床时间'],source_text='今天不在家，吃饭休息50分钟')
+        self.assertNotIn('place_id',resolve_places(sample_state(),[wake])[0])
+
+    def test_wake_rule_does_not_generalize_all_meals_or_research_to_home(self):
+        for name in ('吃饭休息','研究起床习惯'):
+            activity={**self.extracted()[0],'source_ancestors':['日常'],'event_name':name}
+            resolved=resolve_places(sample_state(),[activity])[0]
+            self.assertNotIn('place_id',resolved)
+            self.assertNotEqual(resolved.get('place_match_basis'),'user_wake_home')
+
+    def test_wake_home_requires_unique_mapping_and_observed_home_capacity(self):
+        wake=self.extracted()[0];phone=sample_state()
+        phone['places'].append({'id':'other-home','name':'家'})
+        phone['segments'].insert(0,{'id':'other-home','kind':'place','placeId':'other-home','placeName':'家','start':START,'end':START+3600000})
+        resolved=resolve_places(phone,[wake])[0]
+        self.assertEqual(resolved['place_match_status'],'ambiguous')
+        phone=sample_state();phone['places']=[p for p in phone['places'] if p['id']!='home'];phone['segments']=[s for s in phone['segments'] if s['placeId']!='home']
+        self.assertNotIn('place_id',resolve_places(phone,[wake])[0])
+        phone=sample_state();phone['segments'][-1]['end']=phone['segments'][-1]['start']+10*60000
+        result=analyze(phone,[wake],RULES,START,END,END)
+        home=next(p for p in result['days'][0]['locations'] if p['id']=='home')
+        self.assertIsNone(home['utilization'])
+        self.assertTrue(any('活动总时长超过' in warning for warning in result['days'][0]['warnings']))
 
     def test_production_factory_passes_aliases_to_analysis(self):
         with tempfile.TemporaryDirectory() as temp:
