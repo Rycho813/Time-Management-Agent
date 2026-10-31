@@ -18,9 +18,12 @@ def build_app(environ=None):
     rules=typed_rules(json.loads(Path(env['TIMEMAP_RULES']).read_text()))
     if not rules.get('version'):raise ValueError('缺少规则版本')
     enabled=env.get('TIMEMAP_ALLOW_MODEL')=='1';provider=None
+    aliases={}
     if enabled:
+        aliases=json.loads(env.get('TIMEMAP_PLACE_ALIASES','{}'))
+        if not isinstance(aliases,dict) or any(not isinstance(k,str) or not k.strip() or not isinstance(v,str) or not v.strip() for k,v in aliases.items()):raise ValueError('地点别名配置无效')
         if any(not env.get(n) for n in ['NOTION_TOKEN','TIMEMAP_NOTION_PAGES','GEMINI_API_KEY','GEMINI_MODEL']):raise ValueError('缺少模型配置')
         transport=Transport(allow_network=True)
         source=NotionSource({int(y):p for y,p in json.loads(env['TIMEMAP_NOTION_PAGES']).items()},env['NOTION_TOKEN'],transport)
-        provider=ActivityProvider(source,ActivityExtractor(GeminiModel(env['GEMINI_API_KEY'],env['GEMINI_MODEL'],transport),json.loads(env.get('TIMEMAP_PLACE_ALIASES','{}'))))
-    return create_app(path,env['TIMEMAP_DEVICE_TOKEN'],rules=rules,origins=origins,eager=False,mode='production',embedded_worker=False,activity_provider=provider,allow_efficiency=enabled,allow_send=env.get('TIMEMAP_ALLOW_SEND')=='1')
+        provider=ActivityProvider(source,ActivityExtractor(GeminiModel(env['GEMINI_API_KEY'],env['GEMINI_MODEL'],transport),aliases))
+    return create_app(path,env['TIMEMAP_DEVICE_TOKEN'],rules=rules,origins=origins,eager=False,mode='production',embedded_worker=False,activity_provider=provider,allow_efficiency=enabled,allow_send=env.get('TIMEMAP_ALLOW_SEND')=='1',place_aliases=aliases)

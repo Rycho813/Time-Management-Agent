@@ -34,7 +34,7 @@ class Request(BaseModel):
     send_report: bool=False
 
 
-def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager=True,activity_provider=None,mode="mock",embedded_worker=True,allow_efficiency=True,allow_send=False):
+def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager=True,activity_provider=None,mode="mock",embedded_worker=True,allow_efficiency=True,allow_send=False,place_aliases=None):
     if not token or len(token)<16: raise ValueError('显式设置至少16字符的本地测试凭据')
     if mode not in ('mock','production'):raise ValueError('未知运行模式')
     if mode=='production' and (len(token)<32 or rules is None or activities is not None or eager or embedded_worker):raise ValueError('真实模式配置不完整或包含模拟数据')
@@ -50,7 +50,7 @@ def create_app(path,token,activities=None,rules=None,origins=(),clock=None,eager
         active_rules=deepcopy(rules)
         if request.mode=='efficiency' and (not allow_efficiency or (mode=='production' and activity_provider is None)):raise ValueError('efficiency_disabled')
         extracted = (activity_provider(request.start,request.end,active_rules) if activity_provider else activities) if request.mode=='efficiency' else []
-        result=analyze(state,extracted,active_rules,request.start,request.end,clock())
+        result=analyze(state,extracted,active_rules,request.start,request.end,clock(),place_aliases=place_aliases)
         result.update({'id':request.request_id,'status':'succeeded','mode':request.mode,'data_revision':rev,'mock':mode=='mock','delivery':'queued' if request.send_report else 'not_requested','stale_allowed':request.allow_stale})
         if request.mode=='location':
             for day in result['days']:

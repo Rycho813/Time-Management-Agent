@@ -53,9 +53,11 @@ def day_ranges(start,end):
         yield d.date().isoformat(),cursor,right
         cursor=right
 
-def analyze(state,activities,rules,start,end,now):
+def analyze(state,activities,rules,start,end,now,place_aliases=None):
     """Activities are structured provider output, not keyword-classified fiction."""
     validate_state(state); validate_range(start,end)
+    from .place_matching import resolve_places, VERSION
+    activities=resolve_places(state,activities,place_aliases)
     parts=clip(state['segments'],start,end,now)
     def one(left,right):
         pieces=clip(state['segments'],left,right,now)
@@ -63,14 +65,14 @@ def analyze(state,activities,rules,start,end,now):
         names={p['id']:p['name'] for p in state['places']}
         for s in pieces:
             if s['kind']=='place':
-                p=locations.setdefault(s['placeId'],{'id':s['placeId'],'name':names.get(s['placeId'],s['placeName']),'stay_ms':0,'effective_ms':0,'activities':[],'uncertain':False})
+                p=locations.setdefault(s['placeId'],{'id':s['placeId'],'name':names.get(s['placeId'],s['placeName']),'stay_ms':0,'effective_ms':0,'activities':[],'uncertain':False,'recorded_activity_ms':0})
                 p['stay_ms']+=s['duration']
         date=datetime.fromtimestamp(left/1000,TZ).date().isoformat()
         full=left==int(datetime.fromisoformat(date).replace(tzinfo=TZ).timestamp()*1000) and right-left==DAY
         def mark_uncertain(activity):
             # Missing BUFFER/IGNORED attribution does not invalidate effective-time ratios.
             if rules['categories'].get(activity.get('category'),'ignored') != 'effective':return
-            ids=set()
+            ids=set(activity.get('place_ids',[])) & set(locations)
             if activity.get('place_id') in locations:ids.add(activity['place_id'])
             if activity.get('start') is not None and activity.get('end') is not None:
                 ids.update(s['placeId'] for s in pieces if s['kind']=='place' and s['displayStart']<activity['end'] and s['displayEnd']>activity['start'])
@@ -95,8 +97,12 @@ def analyze(state,activities,rules,start,end,now):
             if classification not in ('effective','buffer','ignored'): raise ValueError('分类规则无效')
             event={**a,'time_type':classification,'rule_version':rules['version']}
             warnings.extend(f'活动{aid}：{warning}' for warning in a.get('time_warnings',[]))
+            if a.get('place_match_status') in ('group','ambiguous'):
+                unknown.append({**event,'reason':a['place_match_reason']})
+                mark_uncertain(a)
+                continue
             if a.get('temporal_issue') or a.get('unmatched_place'):
-                unknown.append({**event,'reason':a.get('temporal_issue') or '明确地点尚未确认别名，不能按时间改配到其他地点'})
+                unknown.append({**event,'reason':a.get('temporal_issue') or a.get('place_match_reason') or '明确地点尚未确认别名，不能按时间改配到其他地点'})
                 mark_uncertain(a)
                 continue
             timed=a.get('start') is not None and a.get('end') is not None
@@ -120,21 +126,25 @@ def analyze(state,activities,rules,start,end,now):
                     events.append((s['placeId'],l,r,event))
             elif full and a.get('place_id') in locations:
                 p=locations[a['place_id']]
-                p['activities'].append(event)
+                p['activities'].append({**event,'attribution':'reported_place_duration'})
+                p['recorded_activity_ms']+=round(minutes*60000)
                 if classification=='effective':
                     p['effective_ms']+=round(minutes*60000)
                     allocated.setdefault(p['id'],[]).append(None)
             else:
-                unknown.append({**event,'reason':'缺少地点或部分日缺少精确起止时间'})
+                reason=('原文地点当天没有对应停留记录' if full and a.get('place_id') else '仅有总时长的活动按完整自然日归属，不能确定部分日时长' if not full else '缺少明确地点，不根据活动名称推测地点')
+                unknown.append({**event,'reason':reason})
                 mark_uncertain(a)
         for pid,l,r,event in events:
-            p=locations[pid];p['activities'].append({**event,'matched_start':l,'matched_end':r})
+            p=locations[pid];p['activities'].append({**event,'matched_start':l,'matched_end':r,'attribution':'time_intersection'});p['recorded_activity_ms']+=r-l
             if event['time_type']=='effective':
                 intervals=allocated.setdefault(pid,[])
                 if any(v is not None and max(l,v[0])<min(r,v[1]) for v in intervals):
                     warnings.append(f'有效活动时间重叠:{event["id"]}');p['uncertain']=True
                 intervals.append((l,r));p['effective_ms']+=r-l
         for p in locations.values():
+            if p['recorded_activity_ms']>p['stay_ms']:
+                warnings.append(f'活动总时长超过地点停留:{p["name"]}');p['uncertain']=True
             if p['effective_ms']>p['stay_ms']:
                 warnings.append(f'有效时间超过停留:{p["name"]}');p['uncertain']=True
             if len(allocated.get(p['id'],[]))>1 and None in allocated[p['id']]:
@@ -154,4 +164,4 @@ def analyze(state,activities,rules,start,end,now):
             for k in ('stay_ms','effective_ms'): t[k]+=p[k]
             t['uncertain'] |= p['uncertain']
     for p in totals.values(): p['utilization']=None if p['uncertain'] or not p['stay_ms'] else p['effective_ms']/p['stay_ms']
-    return {'start':start,'end':end,'as_of':now,'rule_version':rules['version'],'timeline':parts,'days':days,'locations':list(totals.values()),'transit_ms':sum(d['transit_ms'] for d in days),'warnings':['进行中记录以查询时刻裁剪'] if any(s['end'] is None for s in parts) else []}
+    return {'start':start,'end':end,'as_of':now,'rule_version':rules['version'],'place_match_version':VERSION,'timeline':parts,'days':days,'locations':list(totals.values()),'transit_ms':sum(d['transit_ms'] for d in days),'warnings':['进行中记录以查询时刻裁剪'] if any(s['end'] is None for s in parts) else []}

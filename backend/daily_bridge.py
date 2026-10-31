@@ -52,6 +52,6 @@ def prepare_legacy_daily(day,sleep_minutes,complete,environ=None,transport=None,
         except (sqlite3.Error, ValueError, TypeError, IndexError):
             raise OSError('地点数据暂不可用') from None
     extractor=ActivityExtractor(model,json.loads(env.get('TIMEMAP_PLACE_ALIASES','{}')),project_names)
-    pipeline=Pipeline(NotionSource(pages,env['NOTION_TOKEN'],http),extractor,locations,rules,None,legacy_complete=complete)
+    pipeline=Pipeline(NotionSource(pages,env['NOTION_TOKEN'],http),extractor,locations,rules,None,legacy_complete=complete,place_aliases=json.loads(env.get('TIMEMAP_PLACE_ALIASES','{}')))
     start,end=day_bounds(day)
     return pipeline.prepare_daily(day,start,end,int(datetime.now(TZ).timestamp()*1000),sleep_minutes)

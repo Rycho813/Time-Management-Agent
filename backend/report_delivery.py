@@ -24,7 +24,7 @@ def render_day(result,day):
     lines+=['','地点统计与活动：']
     for p in day['locations']:
         ratio='无法准确确定' if p['utilization'] is None else f'{p["utilization"]:.2%}'
-        lines.append(f'{p["name"]}：停留{duration(p["stay_ms"])}；已确认有效{duration(p["effective_ms"])}；已确认占比{ratio}')
+        lines.append(f'{p["name"]}：停留{duration(p["stay_ms"])}；已归属有效{duration(p["effective_ms"])}；已归属占比{ratio}')
         for a in p['activities']:
             matched=(a['matched_end']-a['matched_start']) if 'matched_start' in a else a['duration_min']*60000
             label={'effective':'有效','buffer':'缓冲','ignored':'未计入'}[a['time_type']]

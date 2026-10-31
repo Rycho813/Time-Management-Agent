@@ -60,7 +60,7 @@ class NotionSource:
                         if depth>30:raise ValueError('Notion嵌套过深')
                         for child in self.children(parent):
                             text=self.text(child);context=path+[text] if text else path
-                            if text:records.append({'id':child['id'],'date':day,'text':text,'context':' > '.join(context)})
+                            if text:records.append({'id':child['id'],'date':day,'text':text,'context':' > '.join(context),'ancestors':list(path)})
                             if child.get('has_children'):walk(child['id'],context,depth+1)
                     walk(block['id'],[])
         missing=sorted(set(day for day,_,_ in day_ranges(start,end))-found.keys())
@@ -87,6 +87,10 @@ class ActivityExtractor:
 例如上午九点开始阅读半小时：start_text=上午九点，duration_text=半小时，end_text为空。
 所有时间、地点、时长tokens和evidence必须原样摘自source_id对应text或context，不能补写推测词或自己计算end_text。
 九点无上午下午时保留原词；晚上十一点半开始一小时由代码计算跨日。显式结束早于开始但无次日说明时不能擅自补次日。
+记录可能只有地点、活动名称和持续时长，不要求也不推测起止时刻；上午、晚上不是精确钟点。
+地点可以继承明确写出地点的父标题；working、reading、起床时间不是地点，不默认起床或吃饭发生在家。
+多个地点共用一个时长时保留一条活动，place_text保留完整地点组合，不为每个地点重复分配整段时长。
+地点指活动发生地，不是准备前往的目的地。逛书店不直接等于阅读，仍按原文语义及规则分类。
 同一活动只输出一次；父标题时长若为子条目汇总不要重复提取。缺失字段用空字符串。
 time_type只允许effective、buffer、ignored；project_status只允许open、closed、none。整个项目明确完成才closed。
 分类规则：'''+json.dumps(rules,ensure_ascii=False)+'\n原始记录：'+json.dumps(records,ensure_ascii=False)
@@ -111,7 +115,8 @@ time_type只允许effective、buffer、ignored；project_status只允许open、c
             if aid in seen:raise ValueError('模型重复活动')
             seen.add(aid)
             category='type:'+item['time_type']
-            activity={**item,**timing,'id':aid,'date':src['date'],'category':category,'rule_version':rules['version']}
+            activity={**item,**timing,'id':aid,'date':src['date'],'category':category,'rule_version':rules['version'],
+                      'source_text':src['text'],'source_ancestors':src.get('ancestors',src.get('context','').split(' > ')[:-1])}
             if item['place_text'] in self.aliases:activity['place_id']=self.aliases[item['place_text']]
             elif item['place_text']:activity['unmatched_place']=item['place_text']
             out.append(activity)
@@ -147,7 +152,7 @@ class OllamaModel:
 def make_pipeline(pages_by_year,notion_token,model,location_source,rules,sender,transport,aliases=None):
     from .pipeline import Pipeline
     active=typed_rules(rules)
-    return Pipeline(NotionSource(pages_by_year,notion_token,transport),ActivityExtractor(model,aliases),location_source,active,sender)
+    return Pipeline(NotionSource(pages_by_year,notion_token,transport),ActivityExtractor(model,aliases),location_source,active,sender,place_aliases=aliases)
 
 
 class ActivityProvider:

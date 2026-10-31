@@ -56,6 +56,11 @@ def normalize_time(day,start_text='',end_text='',duration_text=''):
     date.fromisoformat(day)
     result={'start':None,'end':None,'duration_min':None,'time_precision':'duration_only','time_warnings':[]}
     if duration_text:result['duration_min']=duration(duration_text)
+    coarse={'凌晨','早上','早晨','上午','中午','下午','傍晚','晚上','夜间','全天'}
+    if (result['duration_min'] is not None and start_text.strip(' ，,') in coarse
+            and (not end_text or end_text.strip(' ，,') in coarse)):
+        result['time_warnings'].append('原文仅有时段描述，按日期记录时长，未推算起止时刻')
+        return result
     try:
         start=clock(start_text,day) if start_text else None
         if end_text:
