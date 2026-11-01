@@ -9,21 +9,87 @@ from time_summary import normalize_items, build_summary, build_activity_snapshot
 
 
 def render_location(result):
-    lines=['【地点效率】']
-    if result.get('location_unavailable'):return '\n'.join(lines+result['warnings'])
-    for day in result['days']:
-        if len(result['days']) > 1:lines.append(day['date'])
-        for p in day['locations']:
-            ratio='无法准确确定' if p['utilization'] is None else f'{p["utilization"]:.1%}'
-            lines.append(f'{p["name"]}：停留{p["stay_ms"]/60000:g}分钟，已归属有效{p["effective_ms"]/60000:g}分钟，利用率{ratio}')
-            for activity in p['activities']:
-                minutes=(activity['matched_end']-activity['matched_start'])/60000 if 'matched_start' in activity else activity['duration_min']
-                label={'effective':'有效','buffer':'缓冲','ignored':'未计入'}[activity['time_type']]
-                lines.append(f'  {activity["event_name"]}：{minutes:g}分钟（{label}）')
-        lines.extend(day['warnings'])
-        lines.extend(f'待确认：{a["event_name"]}，{a["reason"]}' for a in day['unknown'])
-    lines.append(f'路程总计：{result["transit_ms"]/60000:g}分钟')
-    return '\n'.join(lines)
+    from decimal import Decimal, ROUND_HALF_UP
+    import re
+
+    def minutes(value):
+        value = Decimal(str(value))
+        if not value.is_finite() or value < 0:
+            raise ValueError("时长必须是非负有限数")
+        total = int(value.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        hours, remaining = divmod(total, 60)
+        if not hours:
+            return f"{remaining}min"
+        return f"{hours}h{remaining}min" if remaining else f"{hours}h"
+
+    def duration(milliseconds):
+        return minutes(Decimal(str(milliseconds)) / Decimal("60000"))
+
+    def percent(value):
+        if value is None:
+            return "无法准确确定"
+        rounded = (Decimal(str(value)) * 100).quantize(
+            Decimal("1"), rounding=ROUND_HALF_UP
+        )
+        return f"{rounded}%"
+
+    def warning(text):
+        match = re.fullmatch(
+            r"地点日志存在(\d+(?:\.\d+)?)分钟空白(.*)", text
+        )
+        if match:
+            return f"地点日志存在{minutes(match[1])}空白{match[2]}"
+        return text
+
+    def reason(text):
+        match = re.fullmatch(
+            r"(地点组合「.*」合计)(\d+(?:\.\d+)?)分钟"
+            r"(，未记录各地点时长，不自动分摊)",
+            text,
+        )
+        if match:
+            return match[1] + minutes(match[2]) + match[3]
+        return text
+
+    lines = ["【地点效率】"]
+    if result.get("location_unavailable"):
+        return "\n".join(
+            lines + [warning(w) for w in result["warnings"]]
+        )
+
+    for day in result["days"]:
+        if len(result["days"]) > 1:
+            lines.append(day["date"])
+        for place in day["locations"]:
+            lines.append(
+                f'{place["name"]}：停留{duration(place["stay_ms"])}，'
+                f'已归属有效{duration(place["effective_ms"])}，'
+                f'利用率{percent(place["utilization"])}'
+            )
+            for activity in place["activities"]:
+                if "matched_start" in activity:
+                    elapsed = (
+                        Decimal(str(activity["matched_end"]))
+                        - Decimal(str(activity["matched_start"]))
+                    )
+                    displayed = duration(elapsed)
+                else:
+                    displayed = minutes(activity["duration_min"])
+                label = {
+                    "effective": "有效",
+                    "buffer": "缓冲",
+                    "ignored": "未计入",
+                }[activity["time_type"]]
+                lines.append(
+                    f'  {activity["event_name"]}：{displayed}（{label}）'
+                )
+        lines.extend(warning(w) for w in day["warnings"])
+        lines.extend(
+            f'待确认：{a["event_name"]}，{reason(a["reason"])}'
+            for a in day["unknown"]
+        )
+    lines.append(f'路程总计：{duration(result["transit_ms"])}')
+    return "\n".join(lines)
 
 
 def send_parts(text,sender,max_bytes=12000):
