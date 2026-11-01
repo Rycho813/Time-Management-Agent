@@ -1,136 +1,52 @@
 name: Daily Time Report
-
 on:
   workflow_dispatch:
     inputs:
       target_date:
-        description: "测试日期，格式 YYYY-MM-DD"
-        required: true                   
-        default: "2026-07-11"                    
-        type: string                             
-
+        description: "Connection test only: enter connection-test"
+        required: true
+        default: "connection-test"
+        type: string
       send_feishu:
-        description: "是否发送飞书报告"           
-        required: true                        
-        default: true                       
-        type: boolean                        
-
+        required: true
+        default: false
+        type: boolean
       save_calendar:
-        description: "是否提交 Life Calendar 数据"
-        required: true                      
-        default: false                       
-        type: boolean                      
-
-  schedule:
-    - cron: "43 5 * * *"
-      timezone: "Asia/Singapore"
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
+        required: true
+        default: false
+        type: boolean
+permissions: {}
 concurrency:
-  group: daily-time-report
+  group: timemap-ssh-status-check
   cancel-in-progress: false
-
 jobs:
-  run-daily-report:
+  connection-check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 3
     env:
-      LLM_PROVIDER: gemini
-      NOTION_NAME_PROP: ${{ vars.NOTION_NAME_PROP }}
-      NOTION_DATE_PROP: ${{ vars.NOTION_DATE_PROP }}
-      NOTION_SNAPSHOT_PROP: ${{ vars.NOTION_SNAPSHOT_PROP }}
-      NOTION_SUMMARY_PROP: ${{ vars.NOTION_SUMMARY_PROP }}
-      MIGRATION_YEAR: ${{ vars.MIGRATION_YEAR }}
-      NOTION_VERSION: ${{ vars.NOTION_VERSION }}
-      GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
-      APP_TIMEZONE: ${{ vars.APP_TIMEZONE }}
-      WEEKLY_SUMMARY_DAY: ${{ vars.WEEKLY_SUMMARY_DAY }}
-
-      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-      NOTION_SOURCE_PAGE_ID: ${{ secrets.NOTION_SOURCE_PAGE_ID }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
-      PROJECT_DATABASE_ID: ${{ secrets.PROJECT_DATABASE_ID }}
-
-      LIFE_BIRTH_DATE: ${{ vars.LIFE_BIRTH_DATE }}
-      LIFE_AWAKE_MINUTES: ${{ vars.LIFE_AWAKE_MINUTES }}
-      LIFE_LOW_THRESHOLD: ${{ vars.LIFE_LOW_THRESHOLD }}
-      LIFE_HIGH_THRESHOLD: ${{ vars.LIFE_HIGH_THRESHOLD }}
-      LIFE_COLOR_LOW: ${{ vars.LIFE_COLOR_LOW }}
-      LIFE_COLOR_MEDIUM: ${{ vars.LIFE_COLOR_MEDIUM }}
-      LIFE_COLOR_HIGH: ${{ vars.LIFE_COLOR_HIGH }}
-
+      TEST_TARGET: ${{ inputs.target_date }}
+      SSH_HOST: ${{ secrets.TIMEMAP_DAILY_SSH_HOST }}
+      SSH_PORT: ${{ secrets.TIMEMAP_DAILY_SSH_PORT }}
+      SSH_USER: ${{ secrets.TIMEMAP_DAILY_SSH_USER }}
+      SSH_KEY: ${{ secrets.TIMEMAP_DAILY_SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.TIMEMAP_DAILY_SSH_KNOWN_HOSTS }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          cache: "pip"
-
-      - name: Install dependencies
+      - name: Verify status-only SSH connection
+        shell: bash
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run scheduled migration and summary
-        if: github.event_name == 'schedule'
-        run: |
-          python migrate_and_summary.py
-
-      - name: Run manual migration and summary
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          if [ "${{ inputs.send_feishu }}" = "true" ]; then
-            python migrate_and_summary.py \
-              --date "${{ inputs.target_date }}"
-          else
-            python migrate_and_summary.py \
-              --date "${{ inputs.target_date }}" \
-              --no-feishu
-          fi
-
-      - name: Save Life Calendar data
-        if: github.event_name == 'schedule' || inputs.save_calendar
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add data/life_calendar_daily.json
-          git add web/data/life_calendar.json
-
-          if git diff --cached --quiet; then
-            echo "Life Calendar data has no changes."
-          else
-            git commit -m "Update Life Calendar data"
-            git push origin HEAD:${{ github.event.repository.default_branch }}
-          fi
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: web
-
-  deploy-pages:
-    needs: run-daily-report
-    runs-on: ubuntu-latest
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy Life Calendar
-        id: deployment
-        uses: actions/deploy-pages@v4
+          set -euo pipefail
+          test "$TEST_TARGET" = "connection-test"
+          for n in SSH_HOST SSH_PORT SSH_USER SSH_KEY SSH_KNOWN_HOSTS; do
+            test -n "${!n}"
+          done
+          T=$(mktemp -d "$RUNNER_TEMP/timemap-ssh.XXXXXX")
+          trap 'rm -rf -- "$T"' EXIT
+          umask 077
+          printf '%s\n' "$SSH_KEY" > "$T/key"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$T/known_hosts"
+          timeout 45s ssh -F /dev/null -i "$T/key" -p "$SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$T/known_hosts" \
+            -o ConnectTimeout=15 "$SSH_USER@$SSH_HOST" status > "$T/result.json"
+          python3 -c 'import json,sys; v=json.load(open(sys.argv[1])); assert v.get("service")=="timemap-daily-link" and v.get("mode")=="status_only" and v.get("business_execution_enabled") is False; print("SSH_CONNECTION_TEST_OK"); print("BUSINESS_EXECUTION_ENABLED=false")' "$T/result.json"
