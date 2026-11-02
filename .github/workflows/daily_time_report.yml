@@ -1,136 +1,149 @@
-name: Daily Time Report
-
-on:
-  workflow_dispatch:
-    inputs:
-      target_date:
-        description: "测试日期，格式 YYYY-MM-DD"
-        required: true                   
-        default: "2026-07-11"                    
-        type: string                             
-
-      send_feishu:
-        description: "是否发送飞书报告"           
-        required: true                        
-        default: true                       
-        type: boolean                        
-
-      save_calendar:
-        description: "是否提交 Life Calendar 数据"
-        required: true                      
-        default: false                       
-        type: boolean                      
-
-  schedule:
-    - cron: "43 5 * * *"
-      timezone: "Asia/Singapore"
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: daily-time-report
-  cancel-in-progress: false
-
-jobs:
-  run-daily-report:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    env:
-      LLM_PROVIDER: gemini
-      NOTION_NAME_PROP: ${{ vars.NOTION_NAME_PROP }}
-      NOTION_DATE_PROP: ${{ vars.NOTION_DATE_PROP }}
-      NOTION_SNAPSHOT_PROP: ${{ vars.NOTION_SNAPSHOT_PROP }}
-      NOTION_SUMMARY_PROP: ${{ vars.NOTION_SUMMARY_PROP }}
-      MIGRATION_YEAR: ${{ vars.MIGRATION_YEAR }}
-      NOTION_VERSION: ${{ vars.NOTION_VERSION }}
-      GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
-      APP_TIMEZONE: ${{ vars.APP_TIMEZONE }}
-      WEEKLY_SUMMARY_DAY: ${{ vars.WEEKLY_SUMMARY_DAY }}
-
-      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-      NOTION_SOURCE_PAGE_ID: ${{ secrets.NOTION_SOURCE_PAGE_ID }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
-      PROJECT_DATABASE_ID: ${{ secrets.PROJECT_DATABASE_ID }}
-
-      LIFE_BIRTH_DATE: ${{ vars.LIFE_BIRTH_DATE }}
-      LIFE_AWAKE_MINUTES: ${{ vars.LIFE_AWAKE_MINUTES }}
-      LIFE_LOW_THRESHOLD: ${{ vars.LIFE_LOW_THRESHOLD }}
-      LIFE_HIGH_THRESHOLD: ${{ vars.LIFE_HIGH_THRESHOLD }}
-      LIFE_COLOR_LOW: ${{ vars.LIFE_COLOR_LOW }}
-      LIFE_COLOR_MEDIUM: ${{ vars.LIFE_COLOR_MEDIUM }}
-      LIFE_COLOR_HIGH: ${{ vars.LIFE_COLOR_HIGH }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run scheduled migration and summary
-        if: github.event_name == 'schedule'
-        run: |
-          python migrate_and_summary.py
-
-      - name: Run manual migration and summary
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          if [ "${{ inputs.send_feishu }}" = "true" ]; then
-            python migrate_and_summary.py \
-              --date "${{ inputs.target_date }}"
-          else
-            python migrate_and_summary.py \
-              --date "${{ inputs.target_date }}" \
-              --no-feishu
-          fi
-
-      - name: Save Life Calendar data
-        if: github.event_name == 'schedule' || inputs.save_calendar
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add data/life_calendar_daily.json
-          git add web/data/life_calendar.json
-
-          if git diff --cached --quiet; then
-            echo "Life Calendar data has no changes."
-          else
-            git commit -m "Update Life Calendar data"
-            git push origin HEAD:${{ github.event.repository.default_branch }}
-          fi
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: web
-
-  deploy-pages:
-    needs: run-daily-report
-    runs-on: ubuntu-latest
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy Life Calendar
-        id: deployment
-        uses: actions/deploy-pages@v4
+{
+  "name": "Daily Time Report",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "operation": {
+          "description": "check 只检查连接；run 生成日报并写入 Notion",
+          "required": true,
+          "default": "check",
+          "type": "choice",
+          "options": [
+            "check",
+            "run"
+          ]
+        },
+        "target_date": {
+          "description": "日报日期 YYYY-MM-DD；留空处理昨天",
+          "required": false,
+          "default": "",
+          "type": "string"
+        },
+        "send_feishu": {
+          "description": "是否发送飞书报告",
+          "required": true,
+          "default": false,
+          "type": "boolean"
+        },
+        "save_calendar": {
+          "description": "是否提交并发布周历数据",
+          "required": true,
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "schedule": [
+      {
+        "cron": "43 5 * * *",
+        "timezone": "Asia/Singapore"
+      }
+    ]
+  },
+  "permissions": {
+    "contents": "write",
+    "pages": "write",
+    "id-token": "write"
+  },
+  "concurrency": {
+    "group": "daily-time-report",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "run-daily-report": {
+      "if": "github.ref == format('refs/heads/{0}', github.event.repository.default_branch)",
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 30,
+      "outputs": {
+        "pages_ready": "${{ steps.upload.outcome == 'success' }}"
+      },
+      "env": {
+        "TIMEMAP_DAILY_SSH_HOST": "${{ secrets.TIMEMAP_DAILY_SSH_HOST }}",
+        "TIMEMAP_DAILY_SSH_PORT": "${{ secrets.TIMEMAP_DAILY_SSH_PORT }}",
+        "TIMEMAP_DAILY_SSH_USER": "${{ secrets.TIMEMAP_DAILY_SSH_USER }}",
+        "TIMEMAP_DAILY_SSH_KEY": "${{ secrets.TIMEMAP_DAILY_SSH_KEY }}",
+        "TIMEMAP_DAILY_SSH_KNOWN_HOSTS": "${{ secrets.TIMEMAP_DAILY_SSH_KNOWN_HOSTS }}",
+        "FEISHU_WEBHOOK_URL": "${{ secrets.FEISHU_WEBHOOK_URL }}",
+        "DAILY_TARGET_DATE": "${{ inputs.target_date }}",
+        "DAILY_SEND_FEISHU": "${{ github.event_name == 'schedule' || inputs.send_feishu }}"
+      },
+      "steps": [
+        {
+          "name": "Checkout main",
+          "uses": "actions/checkout@v4",
+          "with": {
+            "ref": "${{ github.event.repository.default_branch }}"
+          }
+        },
+        {
+          "name": "Python",
+          "uses": "actions/setup-python@v5",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Check connection",
+          "if": "github.event_name == 'workflow_dispatch' && inputs.operation == 'check'",
+          "run": "python .github/scripts/timemap_daily_client.py status"
+        },
+        {
+          "name": "Compute report",
+          "id": "daily",
+          "if": "github.event_name == 'schedule' || inputs.operation == 'run'",
+          "run": "python .github/scripts/timemap_daily_client.py fetch"
+        },
+        {
+          "name": "Commit calendar",
+          "if": "steps.daily.outcome == 'success' && (github.event_name == 'schedule' || inputs.save_calendar)",
+          "env": {
+            "DEFAULT_BRANCH": "${{ github.event.repository.default_branch }}"
+          },
+          "run": "git fetch origin \"$DEFAULT_BRANCH\"\ntest \"$(git rev-parse HEAD)\" = \"$(git rev-parse \"origin/$DEFAULT_BRANCH\")\"\ngit config user.name \"github-actions[bot]\"\ngit config user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\ngit add data/life_calendar_daily.json web/data/life_calendar.json\nif ! git diff --cached --quiet; then\n  git commit -m \"Update Life Calendar data\"\n  git push origin \"HEAD:$DEFAULT_BRANCH\"\nfi"
+        },
+        {
+          "name": "Deliver report once",
+          "id": "send_report",
+          "if": "steps.daily.outcome == 'success'",
+          "continue-on-error": true,
+          "run": "python .github/scripts/timemap_daily_client.py send"
+        },
+        {
+          "name": "Configure Pages",
+          "if": "steps.daily.outcome == 'success' && (github.event_name == 'schedule' || inputs.save_calendar)",
+          "uses": "actions/configure-pages@v5"
+        },
+        {
+          "name": "Upload calendar",
+          "id": "upload",
+          "if": "steps.daily.outcome == 'success' && (github.event_name == 'schedule' || inputs.save_calendar)",
+          "uses": "actions/upload-pages-artifact@v4",
+          "with": {
+            "path": "web"
+          }
+        },
+        {
+          "name": "Check delivery",
+          "if": "steps.send_report.outcome == 'failure'",
+          "run": "exit 1"
+        }
+      ]
+    },
+    "deploy-pages": {
+      "if": "${{ always() && !cancelled() && needs.run-daily-report.outputs.pages_ready == 'true' }}",
+      "needs": "run-daily-report",
+      "runs-on": "ubuntu-latest",
+      "environment": {
+        "name": "github-pages",
+        "url": "${{ steps.deployment.outputs.page_url }}"
+      },
+      "steps": [
+        {
+          "name": "Deploy calendar",
+          "id": "deployment",
+          "uses": "actions/deploy-pages@v4"
+        }
+      ]
+    }
+  }
+}
