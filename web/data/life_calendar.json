@@ -1,1346 +1,1346 @@
 {
-  "version": 1,
-  "generated_at": "2026-11-02T01:01:57.070014+00:00",
   "config": {
-    "birth_date": "2000-01-01",
     "awake_minutes_per_day": 1020,
-    "thresholds": {
-      "low": 0.3,
-      "high": 0.6
-    },
+    "birth_date": "2000-01-01",
     "colors": {
+      "high": "#46A267",
       "low": "#D9534F",
-      "medium": "#E2B93B",
-      "high": "#46A267"
+      "medium": "#E2B93B"
+    },
+    "thresholds": {
+      "high": 0.6,
+      "low": 0.3
     }
   },
   "days": [
     {
       "date": "2026-05-20",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-05-21",
-      "effective_minutes": 116,
       "denominator_minutes": 1020,
-      "utilization": 0.113725,
+      "effective_minutes": 116,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.113725
     },
     {
       "date": "2026-05-22",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-04",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-10",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-11",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-12",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-13",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-14",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-16",
-      "effective_minutes": 287,
       "denominator_minutes": 1020,
-      "utilization": 0.281373,
+      "effective_minutes": 287,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.281373
     },
     {
       "date": "2026-06-17",
-      "effective_minutes": 86,
       "denominator_minutes": 1020,
-      "utilization": 0.084314,
+      "effective_minutes": 86,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.084314
     },
     {
       "date": "2026-06-18",
-      "effective_minutes": 145,
       "denominator_minutes": 1020,
-      "utilization": 0.142157,
+      "effective_minutes": 145,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.142157
     },
     {
       "date": "2026-06-22",
-      "effective_minutes": 127,
       "denominator_minutes": 1020,
-      "utilization": 0.12451,
+      "effective_minutes": 127,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.12451
     },
     {
       "date": "2026-06-23",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-24",
-      "effective_minutes": 262,
       "denominator_minutes": 1020,
-      "utilization": 0.256863,
+      "effective_minutes": 262,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.256863
     },
     {
       "date": "2026-06-25",
-      "effective_minutes": 338,
       "denominator_minutes": 1020,
-      "utilization": 0.331373,
+      "effective_minutes": 338,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.331373
     },
     {
       "date": "2026-06-26",
-      "effective_minutes": 255,
       "denominator_minutes": 1020,
-      "utilization": 0.25,
+      "effective_minutes": 255,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.25
     },
     {
       "date": "2026-06-27",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-28",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-06-29",
-      "effective_minutes": 278,
       "denominator_minutes": 1020,
-      "utilization": 0.272549,
+      "effective_minutes": 278,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.272549
     },
     {
       "date": "2026-06-30",
-      "effective_minutes": 379,
       "denominator_minutes": 1020,
-      "utilization": 0.371569,
+      "effective_minutes": 379,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.371569
     },
     {
       "date": "2026-07-01",
-      "effective_minutes": 180,
       "denominator_minutes": 1020,
-      "utilization": 0.176471,
+      "effective_minutes": 180,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.176471
     },
     {
       "date": "2026-07-02",
-      "effective_minutes": 123,
       "denominator_minutes": 1020,
-      "utilization": 0.120588,
+      "effective_minutes": 123,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.120588
     },
     {
       "date": "2026-07-03",
-      "effective_minutes": 198,
       "denominator_minutes": 1020,
-      "utilization": 0.194118,
+      "effective_minutes": 198,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.194118
     },
     {
       "date": "2026-07-04",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-07-05",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-07-06",
-      "effective_minutes": 194,
       "denominator_minutes": 1020,
-      "utilization": 0.190196,
+      "effective_minutes": 194,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.190196
     },
     {
       "date": "2026-07-07",
-      "effective_minutes": 271,
       "denominator_minutes": 1020,
-      "utilization": 0.265686,
+      "effective_minutes": 271,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.265686
     },
     {
       "date": "2026-07-08",
-      "effective_minutes": 306,
       "denominator_minutes": 1020,
-      "utilization": 0.3,
+      "effective_minutes": 306,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.3
     },
     {
       "date": "2026-07-09",
-      "effective_minutes": 369,
       "denominator_minutes": 1020,
-      "utilization": 0.361765,
+      "effective_minutes": 369,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.361765
     },
     {
       "date": "2026-07-10",
-      "effective_minutes": 349,
       "denominator_minutes": 1020,
-      "utilization": 0.342157,
+      "effective_minutes": 349,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.342157
     },
     {
       "date": "2026-07-11",
-      "effective_minutes": 264,
       "denominator_minutes": 1020,
-      "utilization": 0.258824,
+      "effective_minutes": 264,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.258824
     },
     {
       "date": "2026-07-12",
-      "effective_minutes": 90,
       "denominator_minutes": 1020,
-      "utilization": 0.088235,
+      "effective_minutes": 90,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.088235
     },
     {
       "date": "2026-07-13",
-      "effective_minutes": 285,
       "denominator_minutes": 1020,
-      "utilization": 0.279412,
+      "effective_minutes": 285,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.279412
     },
     {
       "date": "2026-07-14",
-      "effective_minutes": 128,
       "denominator_minutes": 1020,
-      "utilization": 0.12549,
+      "effective_minutes": 128,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.12549
     },
     {
       "date": "2026-07-15",
-      "effective_minutes": 291,
       "denominator_minutes": 1020,
-      "utilization": 0.285294,
+      "effective_minutes": 291,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.285294
     },
     {
       "date": "2026-07-16",
-      "effective_minutes": 210,
       "denominator_minutes": 1020,
-      "utilization": 0.205882,
+      "effective_minutes": 210,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.205882
     },
     {
       "date": "2026-07-17",
-      "effective_minutes": 180,
       "denominator_minutes": 1020,
-      "utilization": 0.176471,
+      "effective_minutes": 180,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.176471
     },
     {
       "date": "2026-07-18",
-      "effective_minutes": 96,
       "denominator_minutes": 1020,
-      "utilization": 0.094118,
+      "effective_minutes": 96,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.094118
     },
     {
       "date": "2026-07-19",
-      "effective_minutes": 154,
       "denominator_minutes": 1020,
-      "utilization": 0.15098,
+      "effective_minutes": 154,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.15098
     },
     {
       "date": "2026-07-20",
-      "effective_minutes": 20,
       "denominator_minutes": 1020,
-      "utilization": 0.019608,
+      "effective_minutes": 20,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.019608
     },
     {
       "date": "2026-07-21",
-      "effective_minutes": 150,
       "denominator_minutes": 1020,
-      "utilization": 0.147059,
+      "effective_minutes": 150,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.147059
     },
     {
       "date": "2026-07-22",
-      "effective_minutes": 240,
       "denominator_minutes": 1020,
-      "utilization": 0.235294,
+      "effective_minutes": 240,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.235294
     },
     {
       "date": "2026-07-23",
-      "effective_minutes": 389,
       "denominator_minutes": 1020,
-      "utilization": 0.381373,
+      "effective_minutes": 389,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.381373
     },
     {
       "date": "2026-07-24",
-      "effective_minutes": 121,
       "denominator_minutes": 1020,
-      "utilization": 0.118627,
+      "effective_minutes": 121,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.118627
     },
     {
       "date": "2026-07-25",
-      "effective_minutes": 48,
       "denominator_minutes": 1020,
-      "utilization": 0.047059,
+      "effective_minutes": 48,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.047059
     },
     {
       "date": "2026-07-26",
-      "effective_minutes": 108,
       "denominator_minutes": 1020,
-      "utilization": 0.105882,
+      "effective_minutes": 108,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.105882
     },
     {
       "date": "2026-07-27",
-      "effective_minutes": 397,
       "denominator_minutes": 1020,
-      "utilization": 0.389216,
+      "effective_minutes": 397,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.389216
     },
     {
       "date": "2026-07-28",
-      "effective_minutes": 315,
       "denominator_minutes": 1020,
-      "utilization": 0.308824,
+      "effective_minutes": 315,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.308824
     },
     {
       "date": "2026-07-29",
-      "effective_minutes": 123,
       "denominator_minutes": 1020,
-      "utilization": 0.120588,
+      "effective_minutes": 123,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.120588
     },
     {
       "date": "2026-07-30",
-      "effective_minutes": 364,
       "denominator_minutes": 1020,
-      "utilization": 0.356863,
+      "effective_minutes": 364,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.356863
     },
     {
       "date": "2026-07-31",
-      "effective_minutes": 309,
       "denominator_minutes": 1020,
-      "utilization": 0.302941,
+      "effective_minutes": 309,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.302941
     },
     {
       "date": "2026-08-01",
-      "effective_minutes": 99,
       "denominator_minutes": 1020,
-      "utilization": 0.097059,
+      "effective_minutes": 99,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.097059
     },
     {
       "date": "2026-08-02",
-      "effective_minutes": 151,
       "denominator_minutes": 1020,
-      "utilization": 0.148039,
+      "effective_minutes": 151,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.148039
     },
     {
       "date": "2026-08-03",
-      "effective_minutes": 359,
       "denominator_minutes": 1020,
-      "utilization": 0.351961,
+      "effective_minutes": 359,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.351961
     },
     {
       "date": "2026-08-04",
-      "effective_minutes": 289,
       "denominator_minutes": 1020,
-      "utilization": 0.283333,
+      "effective_minutes": 289,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.283333
     },
     {
       "date": "2026-08-05",
-      "effective_minutes": 312,
       "denominator_minutes": 1020,
-      "utilization": 0.305882,
+      "effective_minutes": 312,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.305882
     },
     {
       "date": "2026-08-06",
-      "effective_minutes": 241,
       "denominator_minutes": 1020,
-      "utilization": 0.236275,
+      "effective_minutes": 241,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.236275
     },
     {
       "date": "2026-08-07",
-      "effective_minutes": 105,
       "denominator_minutes": 1020,
-      "utilization": 0.102941,
+      "effective_minutes": 105,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.102941
     },
     {
       "date": "2026-08-14",
-      "effective_minutes": 152,
       "denominator_minutes": 1020,
-      "utilization": 0.14902,
+      "effective_minutes": 152,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.14902
     },
     {
       "date": "2026-08-15",
-      "effective_minutes": 185,
       "denominator_minutes": 1020,
-      "utilization": 0.181373,
+      "effective_minutes": 185,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.181373
     },
     {
       "date": "2026-08-17",
-      "effective_minutes": 220,
       "denominator_minutes": 1020,
-      "utilization": 0.215686,
+      "effective_minutes": 220,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.215686
     },
     {
       "date": "2026-08-18",
-      "effective_minutes": 196,
       "denominator_minutes": 1020,
-      "utilization": 0.192157,
+      "effective_minutes": 196,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.192157
     },
     {
       "date": "2026-08-19",
-      "effective_minutes": 141,
       "denominator_minutes": 1020,
-      "utilization": 0.138235,
+      "effective_minutes": 141,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.138235
     },
     {
       "date": "2026-08-20",
-      "effective_minutes": 55,
       "denominator_minutes": 1020,
-      "utilization": 0.053922,
+      "effective_minutes": 55,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.053922
     },
     {
       "date": "2026-08-21",
-      "effective_minutes": 189,
       "denominator_minutes": 1020,
-      "utilization": 0.185294,
+      "effective_minutes": 189,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.185294
     },
     {
       "date": "2026-08-22",
-      "effective_minutes": 108,
       "denominator_minutes": 1020,
-      "utilization": 0.105882,
+      "effective_minutes": 108,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.105882
     },
     {
       "date": "2026-08-24",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-08-25",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-08-26",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-08-27",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-08-28",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-08-30",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-08-31",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-09-01",
-      "effective_minutes": 175,
       "denominator_minutes": 1020,
-      "utilization": 0.171569,
+      "effective_minutes": 175,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.171569
     },
     {
       "date": "2026-09-02",
-      "effective_minutes": 152,
       "denominator_minutes": 1020,
-      "utilization": 0.14902,
+      "effective_minutes": 152,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.14902
     },
     {
       "date": "2026-09-03",
-      "effective_minutes": 100,
       "denominator_minutes": 1020,
-      "utilization": 0.098039,
+      "effective_minutes": 100,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.098039
     },
     {
       "date": "2026-09-04",
-      "effective_minutes": 180,
       "denominator_minutes": 1020,
-      "utilization": 0.176471,
+      "effective_minutes": 180,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.176471
     },
     {
       "date": "2026-09-05",
-      "effective_minutes": 63,
       "denominator_minutes": 1020,
-      "utilization": 0.061765,
+      "effective_minutes": 63,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.061765
     },
     {
       "date": "2026-09-06",
-      "effective_minutes": 323,
       "denominator_minutes": 1020,
-      "utilization": 0.316667,
+      "effective_minutes": 323,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.316667
     },
     {
       "date": "2026-09-07",
-      "effective_minutes": 124,
       "denominator_minutes": 1020,
-      "utilization": 0.121569,
+      "effective_minutes": 124,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.121569
     },
     {
       "date": "2026-09-08",
-      "effective_minutes": 181,
       "denominator_minutes": 1020,
-      "utilization": 0.177451,
+      "effective_minutes": 181,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.177451
     },
     {
       "date": "2026-09-09",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-09-10",
-      "effective_minutes": 95,
       "denominator_minutes": 1020,
-      "utilization": 0.093137,
+      "effective_minutes": 95,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.093137
     },
     {
       "date": "2026-09-11",
-      "effective_minutes": 106,
       "denominator_minutes": 1020,
-      "utilization": 0.103922,
+      "effective_minutes": 106,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.103922
     },
     {
       "date": "2026-09-12",
-      "effective_minutes": 180,
       "denominator_minutes": 1020,
-      "utilization": 0.176471,
+      "effective_minutes": 180,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.176471
     },
     {
       "date": "2026-09-14",
-      "effective_minutes": 100,
       "denominator_minutes": 1020,
-      "utilization": 0.098039,
+      "effective_minutes": 100,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.098039
     },
     {
       "date": "2026-09-15",
-      "effective_minutes": 314,
       "denominator_minutes": 1020,
-      "utilization": 0.307843,
+      "effective_minutes": 314,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.307843
     },
     {
       "date": "2026-09-16",
-      "effective_minutes": 440,
       "denominator_minutes": 1020,
-      "utilization": 0.431373,
+      "effective_minutes": 440,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.431373
     },
     {
       "date": "2026-09-17",
-      "effective_minutes": 280,
       "denominator_minutes": 1020,
-      "utilization": 0.27451,
+      "effective_minutes": 280,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.27451
     },
     {
       "date": "2026-09-18",
-      "effective_minutes": 284,
       "denominator_minutes": 1020,
-      "utilization": 0.278431,
+      "effective_minutes": 284,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.278431
     },
     {
       "date": "2026-09-19",
-      "effective_minutes": 145,
       "denominator_minutes": 1020,
-      "utilization": 0.142157,
+      "effective_minutes": 145,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.142157
     },
     {
       "date": "2026-09-20",
-      "effective_minutes": 342,
       "denominator_minutes": 1020,
-      "utilization": 0.335294,
+      "effective_minutes": 342,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.335294
     },
     {
       "date": "2026-09-21",
-      "effective_minutes": 302,
       "denominator_minutes": 1020,
-      "utilization": 0.296078,
+      "effective_minutes": 302,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.296078
     },
     {
       "date": "2026-09-22",
-      "effective_minutes": 241,
       "denominator_minutes": 1020,
-      "utilization": 0.236275,
+      "effective_minutes": 241,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.236275
     },
     {
       "date": "2026-09-23",
-      "effective_minutes": 248,
       "denominator_minutes": 1020,
-      "utilization": 0.243137,
+      "effective_minutes": 248,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.243137
     },
     {
       "date": "2026-09-24",
-      "effective_minutes": 192,
       "denominator_minutes": 1020,
-      "utilization": 0.188235,
+      "effective_minutes": 192,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.188235
     },
     {
       "date": "2026-09-26",
-      "effective_minutes": 165,
       "denominator_minutes": 1020,
-      "utilization": 0.161765,
+      "effective_minutes": 165,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.161765
     },
     {
       "date": "2026-09-27",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-09-28",
-      "effective_minutes": 30,
       "denominator_minutes": 1020,
-      "utilization": 0.029412,
+      "effective_minutes": 30,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.029412
     },
     {
       "date": "2026-09-29",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-09-30",
-      "effective_minutes": 229,
       "denominator_minutes": 1020,
-      "utilization": 0.22451,
+      "effective_minutes": 229,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.22451
     },
     {
       "date": "2026-10-01",
-      "effective_minutes": 132,
       "denominator_minutes": 1020,
-      "utilization": 0.129412,
+      "effective_minutes": 132,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.129412
     },
     {
       "date": "2026-10-02",
-      "effective_minutes": 336,
       "denominator_minutes": 1020,
-      "utilization": 0.329412,
+      "effective_minutes": 336,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.329412
     },
     {
       "date": "2026-10-03",
-      "effective_minutes": 352,
       "denominator_minutes": 1020,
-      "utilization": 0.345098,
+      "effective_minutes": 352,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.345098
     },
     {
       "date": "2026-10-04",
-      "effective_minutes": 57,
       "denominator_minutes": 1020,
-      "utilization": 0.055882,
+      "effective_minutes": 57,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.055882
     },
     {
       "date": "2026-10-05",
-      "effective_minutes": 180,
       "denominator_minutes": 1020,
-      "utilization": 0.176471,
+      "effective_minutes": 180,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.176471
     },
     {
       "date": "2026-10-06",
-      "effective_minutes": 240,
       "denominator_minutes": 1020,
-      "utilization": 0.235294,
+      "effective_minutes": 240,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.235294
     },
     {
       "date": "2026-10-07",
-      "effective_minutes": 187,
       "denominator_minutes": 1020,
-      "utilization": 0.183333,
+      "effective_minutes": 187,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.183333
     },
     {
       "date": "2026-10-08",
-      "effective_minutes": 240,
       "denominator_minutes": 1020,
-      "utilization": 0.235294,
+      "effective_minutes": 240,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.235294
     },
     {
       "date": "2026-10-09",
-      "effective_minutes": 150,
       "denominator_minutes": 1020,
-      "utilization": 0.147059,
+      "effective_minutes": 150,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.147059
     },
     {
       "date": "2026-10-10",
-      "effective_minutes": 150,
       "denominator_minutes": 1020,
-      "utilization": 0.147059,
+      "effective_minutes": 150,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.147059
     },
     {
       "date": "2026-10-11",
-      "effective_minutes": 336,
       "denominator_minutes": 1020,
-      "utilization": 0.329412,
+      "effective_minutes": 336,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.329412
     },
     {
       "date": "2026-10-12",
-      "effective_minutes": 355,
       "denominator_minutes": 1020,
-      "utilization": 0.348039,
+      "effective_minutes": 355,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.348039
     },
     {
       "date": "2026-10-13",
-      "effective_minutes": 349,
       "denominator_minutes": 1020,
-      "utilization": 0.342157,
+      "effective_minutes": 349,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.342157
     },
     {
       "date": "2026-10-14",
-      "effective_minutes": 222,
       "denominator_minutes": 1020,
-      "utilization": 0.217647,
+      "effective_minutes": 222,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.217647
     },
     {
       "date": "2026-10-15",
-      "effective_minutes": 173,
       "denominator_minutes": 1020,
-      "utilization": 0.169608,
+      "effective_minutes": 173,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.169608
     },
     {
       "date": "2026-10-16",
-      "effective_minutes": 255,
       "denominator_minutes": 1020,
-      "utilization": 0.25,
+      "effective_minutes": 255,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.25
     },
     {
       "date": "2026-10-17",
-      "effective_minutes": 120,
       "denominator_minutes": 1020,
-      "utilization": 0.117647,
+      "effective_minutes": 120,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.117647
     },
     {
       "date": "2026-10-18",
-      "effective_minutes": 60,
       "denominator_minutes": 1020,
-      "utilization": 0.058824,
+      "effective_minutes": 60,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.058824
     },
     {
       "date": "2026-10-19",
-      "effective_minutes": 283,
       "denominator_minutes": 1020,
-      "utilization": 0.277451,
+      "effective_minutes": 283,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.277451
     },
     {
       "date": "2026-10-20",
-      "effective_minutes": 440,
       "denominator_minutes": 1020,
-      "utilization": 0.431373,
+      "effective_minutes": 440,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.431373
     },
     {
       "date": "2026-10-21",
-      "effective_minutes": 355,
       "denominator_minutes": 1020,
-      "utilization": 0.348039,
+      "effective_minutes": 355,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.348039
     },
     {
       "date": "2026-10-22",
-      "effective_minutes": 288,
       "denominator_minutes": 1020,
-      "utilization": 0.282353,
+      "effective_minutes": 288,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.282353
     },
     {
       "date": "2026-10-23",
-      "effective_minutes": 402,
       "denominator_minutes": 1020,
-      "utilization": 0.394118,
+      "effective_minutes": 402,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.394118
     },
     {
       "date": "2026-10-24",
-      "effective_minutes": 288,
       "denominator_minutes": 1020,
-      "utilization": 0.282353,
+      "effective_minutes": 288,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.282353
     },
     {
       "date": "2026-10-25",
-      "effective_minutes": 0,
       "denominator_minutes": 1020,
-      "utilization": 0.0,
+      "effective_minutes": 0,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.0
     },
     {
       "date": "2026-10-26",
-      "effective_minutes": 249,
       "denominator_minutes": 1020,
-      "utilization": 0.244118,
+      "effective_minutes": 249,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.244118
     },
     {
       "date": "2026-10-27",
-      "effective_minutes": 158,
       "denominator_minutes": 1020,
-      "utilization": 0.154902,
+      "effective_minutes": 158,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.154902
     },
     {
       "date": "2026-10-28",
-      "effective_minutes": 489,
       "denominator_minutes": 1020,
-      "utilization": 0.479412,
+      "effective_minutes": 489,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.479412
     },
     {
       "date": "2026-10-29",
-      "effective_minutes": 470,
       "denominator_minutes": 1020,
-      "utilization": 0.460784,
+      "effective_minutes": 470,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.460784
     },
     {
       "date": "2026-10-30",
-      "effective_minutes": 161,
       "denominator_minutes": 1020,
-      "utilization": 0.157843,
+      "effective_minutes": 161,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.157843
     },
     {
       "date": "2026-10-31",
-      "effective_minutes": 330,
       "denominator_minutes": 1020,
-      "utilization": 0.323529,
+      "effective_minutes": 330,
       "level": "medium",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.323529
     },
     {
       "date": "2026-11-01",
-      "effective_minutes": 291,
       "denominator_minutes": 1020,
-      "utilization": 0.285294,
+      "effective_minutes": 120,
       "level": "low",
-      "status": "complete"
+      "status": "complete",
+      "utilization": 0.117647
     }
   ],
+  "generated_at": "2026-11-03T02:04:10.280887+00:00",
+  "version": 1,
   "weeks": [
     {
-      "life_week_index": 1377,
-      "iso_week": "2026年第21周",
-      "week_start": "2026-05-18",
-      "week_end": "2026-05-24",
-      "total_effective_minutes": 116,
       "average_effective_minutes": 17,
-      "recorded_days": 7,
       "average_utilization": 0.016246,
-      "level": "low"
+      "iso_week": "2026年第21周",
+      "level": "low",
+      "life_week_index": 1377,
+      "recorded_days": 7,
+      "total_effective_minutes": 116,
+      "week_end": "2026-05-24",
+      "week_start": "2026-05-18"
     },
     {
-      "life_week_index": 1379,
+      "average_effective_minutes": 0,
+      "average_utilization": 0.0,
       "iso_week": "2026年第23周",
-      "week_start": "2026-06-01",
+      "level": "low",
+      "life_week_index": 1379,
+      "recorded_days": 7,
+      "total_effective_minutes": 0,
       "week_end": "2026-06-07",
-      "total_effective_minutes": 0,
-      "average_effective_minutes": 0,
-      "recorded_days": 7,
-      "average_utilization": 0.0,
-      "level": "low"
+      "week_start": "2026-06-01"
     },
     {
-      "life_week_index": 1380,
+      "average_effective_minutes": 0,
+      "average_utilization": 0.0,
       "iso_week": "2026年第24周",
-      "week_start": "2026-06-08",
+      "level": "low",
+      "life_week_index": 1380,
+      "recorded_days": 7,
+      "total_effective_minutes": 0,
       "week_end": "2026-06-14",
-      "total_effective_minutes": 0,
-      "average_effective_minutes": 0,
-      "recorded_days": 7,
-      "average_utilization": 0.0,
-      "level": "low"
+      "week_start": "2026-06-08"
     },
     {
-      "life_week_index": 1381,
-      "iso_week": "2026年第25周",
-      "week_start": "2026-06-15",
-      "week_end": "2026-06-21",
-      "total_effective_minutes": 518,
       "average_effective_minutes": 74,
-      "recorded_days": 7,
       "average_utilization": 0.072549,
-      "level": "low"
+      "iso_week": "2026年第25周",
+      "level": "low",
+      "life_week_index": 1381,
+      "recorded_days": 7,
+      "total_effective_minutes": 518,
+      "week_end": "2026-06-21",
+      "week_start": "2026-06-15"
     },
     {
-      "life_week_index": 1382,
-      "iso_week": "2026年第26周",
-      "week_start": "2026-06-22",
-      "week_end": "2026-06-28",
-      "total_effective_minutes": 982,
       "average_effective_minutes": 140,
-      "recorded_days": 7,
       "average_utilization": 0.137535,
-      "level": "low"
+      "iso_week": "2026年第26周",
+      "level": "low",
+      "life_week_index": 1382,
+      "recorded_days": 7,
+      "total_effective_minutes": 982,
+      "week_end": "2026-06-28",
+      "week_start": "2026-06-22"
     },
     {
-      "life_week_index": 1383,
-      "iso_week": "2026年第27周",
-      "week_start": "2026-06-29",
-      "week_end": "2026-07-05",
-      "total_effective_minutes": 1158,
       "average_effective_minutes": 165,
-      "recorded_days": 7,
       "average_utilization": 0.162185,
-      "level": "low"
+      "iso_week": "2026年第27周",
+      "level": "low",
+      "life_week_index": 1383,
+      "recorded_days": 7,
+      "total_effective_minutes": 1158,
+      "week_end": "2026-07-05",
+      "week_start": "2026-06-29"
     },
     {
-      "life_week_index": 1384,
-      "iso_week": "2026年第28周",
-      "week_start": "2026-07-06",
-      "week_end": "2026-07-12",
-      "total_effective_minutes": 1843,
       "average_effective_minutes": 263,
-      "recorded_days": 7,
       "average_utilization": 0.258123,
-      "level": "low"
+      "iso_week": "2026年第28周",
+      "level": "low",
+      "life_week_index": 1384,
+      "recorded_days": 7,
+      "total_effective_minutes": 1843,
+      "week_end": "2026-07-12",
+      "week_start": "2026-07-06"
     },
     {
-      "life_week_index": 1385,
-      "iso_week": "2026年第29周",
-      "week_start": "2026-07-13",
-      "week_end": "2026-07-19",
-      "total_effective_minutes": 1344,
       "average_effective_minutes": 192,
-      "recorded_days": 7,
       "average_utilization": 0.188235,
-      "level": "low"
+      "iso_week": "2026年第29周",
+      "level": "low",
+      "life_week_index": 1385,
+      "recorded_days": 7,
+      "total_effective_minutes": 1344,
+      "week_end": "2026-07-19",
+      "week_start": "2026-07-13"
     },
     {
-      "life_week_index": 1386,
-      "iso_week": "2026年第30周",
-      "week_start": "2026-07-20",
-      "week_end": "2026-07-26",
-      "total_effective_minutes": 1076,
       "average_effective_minutes": 154,
-      "recorded_days": 7,
       "average_utilization": 0.1507,
-      "level": "low"
+      "iso_week": "2026年第30周",
+      "level": "low",
+      "life_week_index": 1386,
+      "recorded_days": 7,
+      "total_effective_minutes": 1076,
+      "week_end": "2026-07-26",
+      "week_start": "2026-07-20"
     },
     {
-      "life_week_index": 1387,
-      "iso_week": "2026年第31周",
-      "week_start": "2026-07-27",
-      "week_end": "2026-08-02",
-      "total_effective_minutes": 1758,
       "average_effective_minutes": 251,
-      "recorded_days": 7,
       "average_utilization": 0.246218,
-      "level": "low"
+      "iso_week": "2026年第31周",
+      "level": "low",
+      "life_week_index": 1387,
+      "recorded_days": 7,
+      "total_effective_minutes": 1758,
+      "week_end": "2026-08-02",
+      "week_start": "2026-07-27"
     },
     {
-      "life_week_index": 1388,
-      "iso_week": "2026年第32周",
-      "week_start": "2026-08-03",
-      "week_end": "2026-08-09",
-      "total_effective_minutes": 1306,
       "average_effective_minutes": 187,
-      "recorded_days": 7,
       "average_utilization": 0.182913,
-      "level": "low"
+      "iso_week": "2026年第32周",
+      "level": "low",
+      "life_week_index": 1388,
+      "recorded_days": 7,
+      "total_effective_minutes": 1306,
+      "week_end": "2026-08-09",
+      "week_start": "2026-08-03"
     },
     {
-      "life_week_index": 1389,
-      "iso_week": "2026年第33周",
-      "week_start": "2026-08-10",
-      "week_end": "2026-08-16",
-      "total_effective_minutes": 337,
       "average_effective_minutes": 48,
-      "recorded_days": 7,
       "average_utilization": 0.047199,
-      "level": "low"
+      "iso_week": "2026年第33周",
+      "level": "low",
+      "life_week_index": 1389,
+      "recorded_days": 7,
+      "total_effective_minutes": 337,
+      "week_end": "2026-08-16",
+      "week_start": "2026-08-10"
     },
     {
-      "life_week_index": 1390,
-      "iso_week": "2026年第34周",
-      "week_start": "2026-08-17",
-      "week_end": "2026-08-23",
-      "total_effective_minutes": 909,
       "average_effective_minutes": 130,
-      "recorded_days": 7,
       "average_utilization": 0.127311,
-      "level": "low"
+      "iso_week": "2026年第34周",
+      "level": "low",
+      "life_week_index": 1390,
+      "recorded_days": 7,
+      "total_effective_minutes": 909,
+      "week_end": "2026-08-23",
+      "week_start": "2026-08-17"
     },
     {
-      "life_week_index": 1391,
-      "iso_week": "2026年第35周",
-      "week_start": "2026-08-24",
-      "week_end": "2026-08-30",
-      "total_effective_minutes": 0,
       "average_effective_minutes": 0,
-      "recorded_days": 7,
       "average_utilization": 0.0,
-      "level": "low"
+      "iso_week": "2026年第35周",
+      "level": "low",
+      "life_week_index": 1391,
+      "recorded_days": 7,
+      "total_effective_minutes": 0,
+      "week_end": "2026-08-30",
+      "week_start": "2026-08-24"
     },
     {
-      "life_week_index": 1392,
-      "iso_week": "2026年第36周",
-      "week_start": "2026-08-31",
-      "week_end": "2026-09-06",
-      "total_effective_minutes": 993,
       "average_effective_minutes": 142,
-      "recorded_days": 7,
       "average_utilization": 0.139076,
-      "level": "low"
+      "iso_week": "2026年第36周",
+      "level": "low",
+      "life_week_index": 1392,
+      "recorded_days": 7,
+      "total_effective_minutes": 993,
+      "week_end": "2026-09-06",
+      "week_start": "2026-08-31"
     },
     {
-      "life_week_index": 1393,
-      "iso_week": "2026年第37周",
-      "week_start": "2026-09-07",
-      "week_end": "2026-09-13",
-      "total_effective_minutes": 686,
       "average_effective_minutes": 98,
-      "recorded_days": 7,
       "average_utilization": 0.096078,
-      "level": "low"
+      "iso_week": "2026年第37周",
+      "level": "low",
+      "life_week_index": 1393,
+      "recorded_days": 7,
+      "total_effective_minutes": 686,
+      "week_end": "2026-09-13",
+      "week_start": "2026-09-07"
     },
     {
-      "life_week_index": 1394,
-      "iso_week": "2026年第38周",
-      "week_start": "2026-09-14",
-      "week_end": "2026-09-20",
-      "total_effective_minutes": 1905,
       "average_effective_minutes": 272,
-      "recorded_days": 7,
       "average_utilization": 0.266807,
-      "level": "low"
+      "iso_week": "2026年第38周",
+      "level": "low",
+      "life_week_index": 1394,
+      "recorded_days": 7,
+      "total_effective_minutes": 1905,
+      "week_end": "2026-09-20",
+      "week_start": "2026-09-14"
     },
     {
-      "life_week_index": 1395,
-      "iso_week": "2026年第39周",
-      "week_start": "2026-09-21",
-      "week_end": "2026-09-27",
-      "total_effective_minutes": 1148,
       "average_effective_minutes": 164,
-      "recorded_days": 7,
       "average_utilization": 0.160784,
-      "level": "low"
+      "iso_week": "2026年第39周",
+      "level": "low",
+      "life_week_index": 1395,
+      "recorded_days": 7,
+      "total_effective_minutes": 1148,
+      "week_end": "2026-09-27",
+      "week_start": "2026-09-21"
     },
     {
-      "life_week_index": 1396,
-      "iso_week": "2026年第40周",
-      "week_start": "2026-09-28",
-      "week_end": "2026-10-04",
-      "total_effective_minutes": 1136,
       "average_effective_minutes": 162,
-      "recorded_days": 7,
       "average_utilization": 0.159104,
-      "level": "low"
+      "iso_week": "2026年第40周",
+      "level": "low",
+      "life_week_index": 1396,
+      "recorded_days": 7,
+      "total_effective_minutes": 1136,
+      "week_end": "2026-10-04",
+      "week_start": "2026-09-28"
     },
     {
-      "life_week_index": 1397,
-      "iso_week": "2026年第41周",
-      "week_start": "2026-10-05",
-      "week_end": "2026-10-11",
-      "total_effective_minutes": 1483,
       "average_effective_minutes": 212,
-      "recorded_days": 7,
       "average_utilization": 0.207703,
-      "level": "low"
+      "iso_week": "2026年第41周",
+      "level": "low",
+      "life_week_index": 1397,
+      "recorded_days": 7,
+      "total_effective_minutes": 1483,
+      "week_end": "2026-10-11",
+      "week_start": "2026-10-05"
     },
     {
-      "life_week_index": 1398,
-      "iso_week": "2026年第42周",
-      "week_start": "2026-10-12",
-      "week_end": "2026-10-18",
-      "total_effective_minutes": 1534,
       "average_effective_minutes": 219,
-      "recorded_days": 7,
       "average_utilization": 0.214846,
-      "level": "low"
+      "iso_week": "2026年第42周",
+      "level": "low",
+      "life_week_index": 1398,
+      "recorded_days": 7,
+      "total_effective_minutes": 1534,
+      "week_end": "2026-10-18",
+      "week_start": "2026-10-12"
     },
     {
-      "life_week_index": 1399,
-      "iso_week": "2026年第43周",
-      "week_start": "2026-10-19",
-      "week_end": "2026-10-25",
-      "total_effective_minutes": 2056,
       "average_effective_minutes": 294,
-      "recorded_days": 7,
       "average_utilization": 0.287955,
-      "level": "low"
+      "iso_week": "2026年第43周",
+      "level": "low",
+      "life_week_index": 1399,
+      "recorded_days": 7,
+      "total_effective_minutes": 2056,
+      "week_end": "2026-10-25",
+      "week_start": "2026-10-19"
     },
     {
-      "life_week_index": 1400,
+      "average_effective_minutes": 282,
+      "average_utilization": 0.276891,
       "iso_week": "2026年第44周",
-      "week_start": "2026-10-26",
-      "week_end": "2026-11-01",
-      "total_effective_minutes": 2148,
-      "average_effective_minutes": 307,
+      "level": "low",
+      "life_week_index": 1400,
       "recorded_days": 7,
-      "average_utilization": 0.30084,
-      "level": "medium"
+      "total_effective_minutes": 1977,
+      "week_end": "2026-11-01",
+      "week_start": "2026-10-26"
     }
   ]
 }
