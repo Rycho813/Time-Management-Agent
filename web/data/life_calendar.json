@@ -1132,9 +1132,17 @@
       "level": "low",
       "status": "complete",
       "utilization": 0.055882
+    },
+    {
+      "date": "2026-11-11",
+      "denominator_minutes": 1020,
+      "effective_minutes": 330,
+      "level": "medium",
+      "status": "complete",
+      "utilization": 0.323529
     }
   ],
-  "generated_at": "2026-11-11T01:29:18.861207+00:00",
+  "generated_at": "2026-11-12T02:31:48.536769+00:00",
   "version": 1,
   "weeks": [
     {
@@ -1402,13 +1410,13 @@
       "week_start": "2026-11-02"
     },
     {
-      "average_effective_minutes": 19,
-      "average_utilization": 0.018627,
+      "average_effective_minutes": 97,
+      "average_utilization": 0.094853,
       "iso_week": "2026年第46周",
       "level": "low",
       "life_week_index": 1402,
       "recorded_days": 7,
-      "total_effective_minutes": 57,
+      "total_effective_minutes": 387,
       "week_end": "2026-11-15",
       "week_start": "2026-11-09"
     }
